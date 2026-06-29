@@ -5,220 +5,279 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Las Palabras del Pibe de Oro</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Inter:wght@400;500;600&family=Courier+Prime:wght@700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&family=Courier+Prime:wght@700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --night:#080c18;--pitch:#0d1224;--panel:#151c2e;--card:#1a2238;--rim:#243050;
-  --gold:#ffd700;--gold2:#b89000;--silver:#c8d4e8;--mist:#6a7d9a;
-  --danger:#e74c3c;--safe:#27ae60;--warn:#f39c12;
-  --r:8px;--tr:.2s ease;
+  --ink:#07090f;--deep:#0b0f1c;--panel:#111827;--card:#161f33;--rim:#1e2d4a;
+  --gold:#f5c518;--gold2:#c9a200;--silver:#c2d0e8;--mist:#5d738f;
+  --red:#e63946;--green:#2dc653;--warn:#f4a261;
+  --r:8px;
 }
-html,body{height:100%;background:var(--night);color:var(--silver);font-family:'Inter',sans-serif;overflow-x:hidden}
+html,body{min-height:100%;background:var(--ink);color:var(--silver);font-family:'Inter',sans-serif;overflow-x:hidden}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--rim)}
 
-/* HERO */
-.hero{position:relative;min-height:200px;overflow:hidden;display:flex;align-items:flex-end;border-bottom:1px solid var(--rim)}
-.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 100% at 25% 50%,rgba(255,215,0,.07) 0%,transparent 70%)}
-.hero-lines{position:absolute;inset:0;background-image:repeating-linear-gradient(90deg,transparent 0,transparent 39px,rgba(255,255,255,.018) 39px,rgba(255,255,255,.018) 40px)}
-.hero-img{position:absolute;right:0;bottom:0;height:195px;object-fit:contain;object-position:bottom right;opacity:.9;-webkit-mask-image:linear-gradient(to left,rgba(0,0,0,.85) 20%,transparent 85%);mask-image:linear-gradient(to left,rgba(0,0,0,.85) 20%,transparent 85%)}
-.hero-content{position:relative;z-index:2;padding:1.75rem 1.5rem 1.25rem;max-width:520px}
-.hero-eye{font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem}
-.hero-title{font-family:'Oswald',sans-serif;font-size:clamp(26px,5vw,46px);font-weight:700;text-transform:uppercase;line-height:1.05;color:#fff}
-.hero-title .acc{color:var(--gold)}
-.hero-conn{font-size:12px;color:var(--mist);margin-top:.5rem;display:flex;align-items:center;gap:6px}
-.cdot{width:7px;height:7px;border-radius:50%;background:var(--danger);transition:background .3s}
-.cdot.on{background:var(--safe)}
+/* ── SPLASH ── */
+#splash{
+  position:fixed;inset:0;z-index:999;
+  background:var(--ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  overflow:hidden;
+  transition:opacity .6s ease;
+}
+#splash.out{opacity:0;pointer-events:none}
+.splash-photo{
+  position:absolute;inset:0;
+  background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Maradona-Mundial_86_con_la_copa.JPG/800px-Maradona-Mundial_86_con_la_copa.JPG') center top/cover no-repeat;
+  opacity:.55;
+}
+.splash-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(7,9,15,1) 0%,rgba(7,9,15,.7) 40%,rgba(7,9,15,.1) 100%);
+}
+.splash-content{
+  position:relative;z-index:2;
+  text-align:center;padding:0 1.5rem 3rem;
+  width:100%;max-width:520px;
+}
+.splash-eyebrow{
+  font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:.75rem;
+}
+.splash-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,12vw,96px);
+  line-height:.92;color:#fff;
+  text-shadow:0 0 80px rgba(245,197,24,.2);
+  margin-bottom:.3rem;
+}
+.splash-title .acc{color:var(--gold)}
+.splash-sub{font-size:13px;color:var(--mist);margin-bottom:2rem;line-height:1.5}
+.splash-btn{
+  font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;
+  background:var(--gold);color:#000;border:none;
+  padding:14px 48px;border-radius:50px;cursor:pointer;
+  transition:transform .15s,background .15s;
+}
+.splash-btn:hover{background:#ffd830;transform:scale(1.04)}
+.splash-btn:active{transform:scale(.97)}
 
-/* MAIN */
-.main{max-width:900px;margin:0 auto;padding:1.25rem 1rem 3rem;display:flex;flex-direction:column;gap:1rem}
+/* ── HEADER ── */
+.header{
+  background:var(--deep);border-bottom:1px solid var(--rim);
+  display:flex;align-items:center;gap:12px;
+  padding:.75rem 1.25rem;position:sticky;top:0;z-index:50;
+}
+.header-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:.05em}
+.header-logo span{color:var(--gold)}
+.conn-wrap{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mist);margin-left:auto}
+.cdot{width:7px;height:7px;border-radius:50%;background:var(--red);transition:background .3s}
+.cdot.on{background:var(--green)}
+
+/* ── MAIN ── */
+.main{max-width:860px;margin:0 auto;padding:1.25rem 1rem 4rem;display:flex;flex-direction:column;gap:1rem}
 .screen{display:none;flex-direction:column;gap:1rem}
 .screen.active{display:flex}
 
-/* CARDS */
+/* ── CARDS ── */
 .card{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:1.25rem 1.5rem}
-.card-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mist);margin-bottom:.75rem}
-.card-label .hl{color:var(--gold)}
+.clabel{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);margin-bottom:.75rem}
+.clabel .g{color:var(--gold)}
 
-/* INPUTS/BUTTONS */
-input[type=text]{background:var(--pitch);border:1px solid var(--rim);border-radius:var(--r);color:var(--silver);font-family:'Inter',sans-serif;font-size:14px;padding:10px 14px;outline:none;width:100%;transition:border-color var(--tr)}
+/* ── INPUTS & BUTTONS ── */
+input[type=text]{
+  background:var(--deep);border:1px solid var(--rim);border-radius:var(--r);
+  color:var(--silver);font-family:'Inter',sans-serif;font-size:14px;
+  padding:10px 14px;outline:none;width:100%;transition:border-color .2s;
+}
 input[type=text]:focus{border-color:var(--gold)}
 input::placeholder{color:var(--mist)}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'Oswald',sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:10px 18px;border-radius:var(--r);border:1px solid var(--rim);background:transparent;color:var(--silver);cursor:pointer;transition:all var(--tr);white-space:nowrap}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.06em;
+  padding:10px 20px;border-radius:var(--r);border:1px solid var(--rim);
+  background:transparent;color:var(--silver);cursor:pointer;transition:all .2s;white-space:nowrap;
+}
 .btn:hover{background:var(--panel);border-color:var(--silver)}
 .btn:active{transform:scale(.97)}
 .btn:disabled{opacity:.35;cursor:default;pointer-events:none}
 .btn-gold{background:var(--gold);border-color:var(--gold);color:#000}
-.btn-gold:hover{background:#ffe84d;border-color:#ffe84d}
-.btn-challenge{background:rgba(231,76,60,.12);border-color:var(--danger);color:var(--danger)}
-.btn-challenge:hover{background:rgba(231,76,60,.25)}
-.btn-sm{font-size:12px;padding:6px 12px}
-.btn-danger{border-color:var(--danger);color:var(--danger)}
-.btn-danger:hover{background:rgba(231,76,60,.1)}
+.btn-gold:hover{background:#ffd830}
+.btn-red{border-color:var(--red);color:var(--red)}
+.btn-red:hover{background:rgba(230,57,70,.1)}
+.btn-warn{border-color:var(--warn);color:var(--warn)}
+.btn-warn:hover{background:rgba(244,162,97,.1)}
+.btn-sm{font-size:13px;padding:6px 12px}
 
-/* LOBBY */
-.lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-@media(max-width:580px){.lobby-grid{grid-template-columns:1fr}}
-.join-form{display:flex;flex-direction:column;gap:.7rem}
-.join-form label{font-size:11px;color:var(--mist);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:2px}
-.join-row{display:flex;gap:8px}
-.join-row input{flex:1}
-.rooms-list{display:flex;flex-direction:column;gap:7px}
-.room-item{display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--panel);border:1px solid var(--rim);border-radius:var(--r);cursor:pointer;transition:border-color var(--tr)}
-.room-item:hover{border-color:var(--gold)}
-.room-icon{width:34px;height:34px;border-radius:50%;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.room-name{font-weight:600;font-size:13px;color:#fff}
-.room-count{font-size:11px;color:var(--mist)}
-.room-empty{text-align:center;padding:2rem;color:var(--mist);font-size:13px}
-.rules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
-.rule-item{display:flex;align-items:flex-start;gap:8px}
-.rule-num{width:22px;height:22px;border-radius:50%;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);color:var(--gold);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.rule-text{font-size:12px;color:var(--mist);line-height:1.5}
+/* ── LOBBY ── */
+.lgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:560px){.lgrid{grid-template-columns:1fr}}
+.jform{display:flex;flex-direction:column;gap:.65rem}
+.jform label{font-size:11px;color:var(--mist);letter-spacing:.05em;text-transform:uppercase;display:block;margin-bottom:2px}
+.jrow{display:flex;gap:8px}
+.jrow input{flex:1}
+.rooms-list{display:flex;flex-direction:column;gap:6px}
+.ritem{display:flex;align-items:center;gap:10px;padding:9px 13px;background:var(--panel);border:1px solid var(--rim);border-radius:var(--r);cursor:pointer;transition:border-color .2s}
+.ritem:hover{border-color:var(--gold)}
+.rico{width:33px;height:33px;border-radius:50%;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.25);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.rname{font-weight:600;font-size:13px;color:#fff}
+.rcnt{font-size:11px;color:var(--mist)}
+.rempty{text-align:center;padding:1.75rem;color:var(--mist);font-size:13px}
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px}
+.ri{display:flex;align-items:flex-start;gap:8px}
+.rnum{width:21px;height:21px;border-radius:50%;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.3);color:var(--gold);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.rtext{font-size:12px;color:var(--mist);line-height:1.5}
 
-/* SALON */
+/* ── SALON ── */
 .salon-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem}
-.salon-code{font-family:'Courier Prime',monospace;font-size:28px;font-weight:700;color:var(--gold);letter-spacing:.3em;background:var(--pitch);border:1px solid rgba(255,215,0,.3);border-radius:var(--r);padding:7px 18px}
-.players-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:7px;margin-bottom:1rem}
+.salon-code{font-family:'Courier Prime',monospace;font-size:28px;font-weight:700;color:var(--gold);letter-spacing:.3em;background:var(--deep);border:1px solid rgba(245,197,24,.3);border-radius:var(--r);padding:7px 18px;display:inline-block}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:7px;margin-bottom:1rem}
 .pslot{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 8px;background:var(--panel);border:1px solid var(--rim);border-radius:var(--r);text-align:center}
 .pslot.me{border-color:var(--gold)}
 .pslot.empty{opacity:.4;border-style:dashed}
-.pav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Oswald',sans-serif;font-size:18px;font-weight:700;color:#000}
+.pav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:19px;color:#000;flex-shrink:0}
 .pslot.empty .pav{background:var(--rim)!important;color:var(--mist);font-size:16px}
 .pname{font-size:12px;font-weight:600;color:var(--silver)}
 .pbadge{font-size:10px;color:var(--gold)}
-.pslot.empty .pname{color:var(--mist);font-style:italic}
 
-/* GAME */
-.game-cols{display:grid;grid-template-columns:1fr 240px;gap:1rem}
-@media(max-width:640px){.game-cols{grid-template-columns:1fr}}
+/* ── GAME ── */
+.gcols{display:grid;grid-template-columns:1fr 230px;gap:1rem}
+@media(max-width:620px){.gcols{grid-template-columns:1fr}}
 
 /* Timer */
-.timer-bar-wrap{height:5px;background:var(--rim);border-radius:3px;overflow:hidden;margin-bottom:.75rem}
-.timer-bar{height:100%;background:var(--gold);border-radius:3px;transition:width 1s linear,background .3s}
-.timer-bar.warn{background:var(--warn)}
-.timer-bar.danger{background:var(--danger)}
-.timer-num{font-family:'Courier Prime',monospace;font-size:22px;font-weight:700;text-align:right;color:var(--gold);margin-bottom:.4rem;transition:color .3s}
+.timer-wrap{margin-bottom:.75rem}
+.timer-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.timer-label{font-size:11px;color:var(--mist);text-transform:uppercase;letter-spacing:.1em}
+.timer-num{font-family:'Courier Prime',monospace;font-size:26px;font-weight:700;color:var(--gold);transition:color .3s;line-height:1}
 .timer-num.warn{color:var(--warn)}
-.timer-num.danger{color:var(--danger);animation:pulse 1s ease infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.timer-num.danger{color:var(--red);animation:blink 1s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.tbar-bg{height:4px;background:var(--rim);border-radius:2px;overflow:hidden}
+.tbar{height:100%;background:var(--gold);border-radius:2px;transition:width 1s linear,background .3s}
+.tbar.warn{background:var(--warn)}
+.tbar.danger{background:var(--red)}
 
 /* Turn banner */
-.turn-banner{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:var(--r);background:var(--panel);border:1px solid var(--rim);font-size:13px;margin-bottom:.75rem}
-.turn-dot{width:9px;height:9px;border-radius:50%;background:var(--mist);flex-shrink:0}
-.turn-banner.myturn{border-color:var(--gold)}
-.turn-banner.myturn .turn-dot{background:var(--gold);box-shadow:0 0 8px var(--gold);animation:pulse 1.2s ease infinite}
-.turn-who{font-weight:600;color:#fff}
-.turn-tag{margin-left:auto;font-size:11px;color:var(--mist)}
+.tbanner{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:var(--r);background:var(--panel);border:1px solid var(--rim);font-size:13px;margin-bottom:.75rem}
+.tdot{width:8px;height:8px;border-radius:50%;background:var(--mist);flex-shrink:0}
+.tbanner.my{border-color:var(--gold)}
+.tbanner.my .tdot{background:var(--gold);box-shadow:0 0 8px var(--gold);animation:blink 1.2s ease infinite}
+.twho{font-weight:600;color:#fff}
+.ttag{margin-left:auto;font-size:11px;color:var(--mist)}
 
-/* Word display */
-.word-card{background:var(--pitch);border:1px solid var(--rim);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:.75rem}
-.word-tiles{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;min-height:64px}
-.tile{width:48px;height:56px;background:var(--card);border:1px solid var(--rim);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'Courier Prime',monospace;font-size:24px;font-weight:700;color:#fff;animation:drop .25s cubic-bezier(.34,1.56,.64,1)}
+/* Word */
+.wcard{background:var(--deep);border:1px solid var(--rim);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:.75rem}
+.wtiles{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;min-height:62px}
+.tile{
+  width:46px;height:54px;background:var(--card);border:1px solid var(--rim);border-radius:5px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Courier Prime',monospace;font-size:22px;font-weight:700;color:#fff;
+  animation:tdrop .22s cubic-bezier(.34,1.56,.64,1);
+}
 .tile.new{border-color:var(--gold);color:var(--gold)}
-.tile.hot{border-color:var(--danger);color:var(--danger)}
-@keyframes drop{from{transform:translateY(-18px);opacity:0}to{transform:translateY(0);opacity:1}}
-.word-empty{color:var(--mist);font-size:14px;font-style:italic}
-.word-meta{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:.75rem}
-.word-len{font-family:'Courier Prime',monospace;font-size:20px;font-weight:700;color:var(--silver)}
-.badge-warn{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:var(--danger);font-size:11px;font-weight:600;padding:2px 9px;border-radius:20px}
-.badge-ok{background:rgba(39,174,96,.1);border:1px solid rgba(39,174,96,.2);color:var(--safe);font-size:11px;padding:2px 9px;border-radius:20px}
+.tile.hot{border-color:var(--red);color:var(--red)}
+@keyframes tdrop{from{transform:translateY(-16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.wempty{color:var(--mist);font-size:13px;font-style:italic}
+.wmeta{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:.75rem}
+.wlen{font-family:'Courier Prime',monospace;font-size:19px;font-weight:700;color:var(--silver)}
+.bwarn{background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.3);color:var(--red);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+.bok{background:rgba(45,198,83,.08);border:1px solid rgba(45,198,83,.2);color:var(--green);font-size:11px;padding:2px 8px;border-radius:20px}
 
 /* Action */
-.action-card{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.75rem}
-.big-input-row{display:flex;gap:8px;align-items:stretch}
-.big-input-row input{width:72px;text-align:center;font-family:'Courier Prime',monospace;font-size:30px;font-weight:700;text-transform:uppercase;padding:4px}
-.btn-challenge-wrap{margin-top:.5rem}
-.waiting-zone{text-align:center;padding:1.25rem;color:var(--mist);font-size:13px;border:1px dashed var(--rim);border-radius:var(--r);margin-bottom:.75rem}
-.dots::after{content:'...';animation:dotanim 1.2s step-start infinite}
-@keyframes dotanim{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
+.acard{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.75rem}
+.abig{display:flex;gap:8px;align-items:stretch}
+.abig input{width:70px;text-align:center;font-family:'Courier Prime',monospace;font-size:28px;font-weight:700;text-transform:uppercase;padding:4px}
+.wzone{text-align:center;padding:1.25rem;color:var(--mist);font-size:13px;border:1px dashed var(--rim);border-radius:var(--r);margin-bottom:.75rem}
+.dots::after{content:'...';animation:da 1.2s step-start infinite}
+@keyframes da{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
 
-/* Challenge overlay */
-.challenge-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.challenge-overlay.show{display:flex}
-.challenge-card{background:var(--card);border:1px solid var(--rim);border-radius:16px;padding:2rem;text-align:center;max-width:360px;width:90%;animation:drop .3s ease}
-.ch-icon{font-size:44px;margin-bottom:.5rem}
-.ch-title{font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;color:#fff;margin-bottom:.3rem}
-.ch-sub{font-size:13px;color:var(--mist);margin-bottom:1rem;line-height:1.5}
-.ch-word{display:inline-block;font-family:'Courier Prime',monospace;font-size:24px;font-weight:700;color:var(--gold);border:1px solid rgba(255,215,0,.3);border-radius:var(--r);padding:4px 16px;margin-bottom:1rem;letter-spacing:.15em}
-.ch-result{font-size:14px;line-height:1.6;margin-bottom:1rem;color:var(--silver)}
-.ch-result.good{color:var(--safe)}
-.ch-result.bad{color:var(--danger)}
-
-/* Scoreboard */
-.score-list{display:flex;flex-direction:column;gap:6px}
-.score-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);background:var(--panel);border:1px solid var(--rim);transition:border-color var(--tr)}
-.score-row.active{border-color:var(--gold);background:rgba(255,215,0,.04)}
-.sav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+/* Scores */
+.slist{display:flex;flex-direction:column;gap:5px}
+.srow{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);background:var(--panel);border:1px solid var(--rim);transition:border-color .2s}
+.srow.active{border-color:var(--gold);background:rgba(245,197,24,.04)}
+.sav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#000;flex-shrink:0}
 .sname{flex:1;font-size:12px;font-weight:600;color:var(--silver);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.score-row.active .sname{color:#fff}
-.spts{font-family:'Courier Prime',monospace;font-size:17px;font-weight:700;color:var(--gold)}
+.srow.active .sname{color:#fff}
+.spts{font-family:'Courier Prime',monospace;font-size:16px;font-weight:700;color:var(--gold)}
 
 /* Log */
-.game-log{display:flex;flex-direction:column;gap:3px;max-height:130px;overflow-y:auto}
-.log-line{font-size:11px;color:var(--mist);padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03)}
-.log-line .actor{color:var(--silver);font-weight:600}
-.log-line.ev{color:var(--danger)}
-.log-line.good{color:var(--safe)}
-.log-line.warn{color:var(--warn)}
-
-/* Round/Game End overlay */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
-.overlay.show{display:flex}
-.ov-card{background:var(--card);border:1px solid var(--rim);border-radius:16px;padding:1.75rem;max-width:400px;width:92%;animation:drop .3s ease;text-align:center}
-.ov-icon{font-size:48px;margin-bottom:.6rem}
-.ov-title{font-family:'Oswald',sans-serif;font-size:24px;font-weight:700;text-transform:uppercase;color:#fff;margin-bottom:.3rem}
-.ov-sub{font-size:13px;color:var(--mist);margin-bottom:.75rem;line-height:1.5}
-.ov-word{display:inline-block;font-family:'Courier Prime',monospace;font-size:22px;font-weight:700;color:var(--gold);border:1px solid rgba(255,215,0,.3);border-radius:var(--r);padding:3px 14px;margin-bottom:1rem;letter-spacing:.15em}
-.podium{display:flex;flex-direction:column;gap:5px;margin-bottom:1.25rem;text-align:left}
-.pod-row{display:flex;align-items:center;gap:9px;padding:8px 12px;border-radius:var(--r);background:var(--panel);border:1px solid var(--rim)}
-.pod-row.first{border-color:var(--gold);background:rgba(255,215,0,.05)}
-.pod-row.loser{border-color:var(--danger);background:rgba(231,76,60,.05)}
-.pod-rank{font-size:12px;color:var(--mist);width:18px}
-.pod-name{flex:1;font-size:13px;font-weight:600;color:var(--silver)}
-.pod-row.first .pod-name{color:#fff}
-.pod-pts{font-family:'Courier Prime',monospace;font-size:17px;font-weight:700;color:var(--gold)}
-.delta{font-size:11px;margin-left:4px}
-.delta.p{color:var(--safe)}
-.delta.z{color:var(--danger)}
-.btn-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.glog{display:flex;flex-direction:column;gap:3px;max-height:120px;overflow-y:auto}
+.ll{font-size:11px;color:var(--mist);padding:2px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.ll .ac{color:var(--silver);font-weight:600}
+.ll.ev{color:var(--red)}
+.ll.ok{color:var(--green)}
+.ll.wn{color:var(--warn)}
 
 /* Round badge */
-.round-badge{display:inline-flex;align-items:center;gap:5px;font-family:'Oswald',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--mist);padding:3px 10px;border:1px solid var(--rim);border-radius:20px}
-.round-badge .rn{color:var(--gold);font-size:14px}
+.rbadge{display:inline-flex;align-items:center;gap:5px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:.08em;color:var(--mist);padding:3px 10px;border:1px solid var(--rim);border-radius:20px}
+.rbadge .rn{color:var(--gold);font-size:16px}
+
+/* Challenge overlay */
+.cov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.cov.show{display:flex}
+.covc{background:var(--card);border:1px solid var(--rim);border-radius:16px;padding:2rem;text-align:center;max-width:340px;width:90%;animation:tdrop .3s ease}
+.cico{font-size:44px;margin-bottom:.5rem}
+.ctit{font-family:'Bebas Neue',sans-serif;font-size:24px;color:#fff;letter-spacing:.05em;margin-bottom:.3rem}
+.csub{font-size:13px;color:var(--mist);margin-bottom:1rem;line-height:1.5}
+.cword{display:inline-block;font-family:'Courier Prime',monospace;font-size:22px;font-weight:700;color:var(--gold);border:1px solid rgba(245,197,24,.3);border-radius:var(--r);padding:4px 16px;margin-bottom:1rem;letter-spacing:.15em}
+.cres{font-size:13px;line-height:1.6;color:var(--silver)}
+.cres.bad{color:var(--red)}
+.cres.good{color:var(--green)}
+
+/* Overlay round/game */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.ov.show{display:flex}
+.ovc{background:var(--card);border:1px solid var(--rim);border-radius:16px;padding:1.75rem;max-width:380px;width:92%;animation:tdrop .3s ease;text-align:center}
+.oico{font-size:46px;margin-bottom:.6rem}
+.otit{font-family:'Bebas Neue',sans-serif;font-size:26px;color:#fff;letter-spacing:.04em;margin-bottom:.3rem}
+.osub{font-size:13px;color:var(--mist);margin-bottom:.75rem;line-height:1.5}
+.oword{display:inline-block;font-family:'Courier Prime',monospace;font-size:21px;font-weight:700;color:var(--gold);border:1px solid rgba(245,197,24,.3);border-radius:var(--r);padding:3px 14px;margin-bottom:1rem;letter-spacing:.15em}
+.pod{display:flex;flex-direction:column;gap:5px;margin-bottom:1.25rem;text-align:left}
+.prow{display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:var(--r);background:var(--panel);border:1px solid var(--rim)}
+.prow.first{border-color:var(--gold);background:rgba(245,197,24,.05)}
+.prow.loser{border-color:var(--red);background:rgba(230,57,70,.05)}
+.prank{font-size:11px;color:var(--mist);width:16px}
+.pnm{flex:1;font-size:13px;font-weight:600;color:var(--silver)}
+.prow.first .pnm{color:#fff}
+.ppts{font-family:'Courier Prime',monospace;font-size:16px;font-weight:700;color:var(--gold)}
+.dl{font-size:11px;margin-left:3px}
+.dl.p{color:var(--green)}.dl.z{color:var(--red)}
+.brow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 </style>
 </head>
 <body>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-lines"></div>
-  <img class="hero-img"
-    src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Maradona-Mundial_86_con_la_copa.JPG/800px-Maradona-Mundial_86_con_la_copa.JPG"
-    alt="Maradona 1986" onerror="this.style.display='none'"/>
-  <div class="hero-content">
-    <div class="hero-eye">⚽ Jeu de lettres · 5 joueurs · Mots français</div>
-    <h1 class="hero-title">Las Palabras<br/>del <span class="acc">Pibe de Oro</span></h1>
-    <div class="hero-conn">
-      <span class="cdot" id="cdot"></span>
-      <span id="connLabel">Connexion...</span>
-    </div>
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-photo"></div>
+  <div class="splash-grad"></div>
+  <div class="splash-content">
+    <div class="splash-eyebrow">⚽ Jeu de lettres multijoueur · Mots français</div>
+    <div class="splash-title">Las Palabras<br/>del <span class="acc">Pibe<br/>de Oro</span></div>
+    <div class="splash-sub">Construis des mots avec tes amis.<br/>Pas de verbes. 15 secondes par tour.</div>
+    <button class="splash-btn" id="splashBtn">JOUER →</button>
   </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-logo">Las Palabras del <span>Pibe de Oro</span></div>
+  <div class="conn-wrap"><span class="cdot" id="cdot"></span><span id="connLabel">Connexion...</span></div>
 </div>
 
 <div class="main">
 
-<!-- ══ LOBBY ══ -->
+<!-- LOBBY -->
 <div class="screen active" id="screenLobby">
-  <div class="lobby-grid">
+  <div class="lgrid">
     <div class="card">
-      <div class="card-label">Créer ou rejoindre</div>
-      <div class="join-form">
+      <div class="clabel">Créer ou rejoindre</div>
+      <div class="jform">
         <div><label>Ton nom</label><input type="text" id="iName" placeholder="ex: El Diego" maxlength="14"/></div>
         <div>
           <label>Code salon (vide = créer)</label>
-          <div class="join-row">
-            <input type="text" id="iCode" placeholder="ex: AB3C" maxlength="4" style="font-family:'Courier Prime',monospace;letter-spacing:.2em;text-transform:uppercase"/>
+          <div class="jrow">
+            <input type="text" id="iCode" placeholder="AB3C" maxlength="4" style="font-family:'Courier Prime',monospace;letter-spacing:.2em;text-transform:uppercase"/>
             <button class="btn btn-gold" id="btnJoin">Entrer →</button>
           </div>
         </div>
@@ -226,266 +285,249 @@ input::placeholder{color:var(--mist)}
       </div>
     </div>
     <div class="card">
-      <div class="card-label">Salons ouverts <span class="hl" id="roomCount"></span></div>
-      <div class="rooms-list" id="roomsList"><div class="room-empty">Aucun salon actif.</div></div>
+      <div class="clabel">Salons ouverts <span class="g" id="roomCount"></span></div>
+      <div class="rooms-list" id="roomsList"><div class="rempty">Aucun salon actif.</div></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-label">Règles du jeu</div>
+    <div class="clabel">Règles</div>
     <div class="rules-grid">
-      <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Chaque joueur ajoute une lettre pour former un mot <strong style="color:var(--silver)">français</strong>.</div></div>
-      <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Mot minimum <strong style="color:var(--silver)">5 lettres</strong>. <strong style="color:var(--danger)">Les verbes sont interdits.</strong></div></div>
-      <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">Tu as <strong style="color:var(--gold)">10 secondes</strong> pour jouer, sinon tu perds la manche.</div></div>
-      <div class="rule-item"><div class="rule-num">4</div><div class="rule-text"><strong style="color:var(--warn)">Challenger</strong> un mot : s'il existe → toi qui perds. S'il n'existe pas → l'autre perd.</div></div>
-      <div class="rule-item"><div class="rule-num">5</div><div class="rule-text">Le perdant marque <strong style="color:var(--danger)">0 pt</strong>. Les autres gagnent autant de pts que le nombre de lettres du mot.</div></div>
+      <div class="ri"><div class="rnum">1</div><div class="rtext">Ajoute une lettre pour former un <strong style="color:var(--silver)">mot français</strong>.</div></div>
+      <div class="ri"><div class="rnum">2</div><div class="rtext">Minimum <strong style="color:var(--silver)">5 lettres</strong>. <strong style="color:var(--red)">Les verbes sont interdits.</strong></div></div>
+      <div class="ri"><div class="rnum">3</div><div class="rtext"><strong style="color:var(--gold)">15 secondes</strong> pour jouer, sinon tu perds la manche.</div></div>
+      <div class="ri"><div class="rnum">4</div><div class="rtext"><strong style="color:var(--warn)">Challenge</strong> : mot valide → challengeur perd. Mot faux → l'autre perd.</div></div>
+      <div class="ri"><div class="rnum">5</div><div class="rtext">Perdant = <strong style="color:var(--red)">0 pt</strong>. Autres gagnent autant de pts que le nombre de lettres.</div></div>
     </div>
   </div>
 </div>
 
-<!-- ══ SALON ══ -->
+<!-- SALON -->
 <div class="screen" id="screenSalon">
   <div class="card">
     <div class="salon-header">
       <div>
-        <div class="card-label" style="margin:0 0 6px">Code du salon</div>
+        <div class="clabel" style="margin:0 0 6px">Code du salon</div>
         <div class="salon-code" id="salonCode">----</div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-sm" id="btnCopy">📋 Copier</button>
-        <button class="btn btn-danger btn-sm" id="btnLeave">Quitter</button>
+        <button class="btn btn-red btn-sm" id="btnLeave">Quitter</button>
       </div>
     </div>
-    <div class="card-label">Joueurs <span id="salonCount" style="color:var(--gold)">0/5</span></div>
-    <div class="players-grid" id="salonPlayers"></div>
+    <div class="clabel">Joueurs <span id="salonCount" style="color:var(--gold)">0/5</span></div>
+    <div class="pgrid" id="salonPlayers"></div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <button class="btn btn-gold" id="btnStart" disabled>Démarrer →</button>
-      <span id="startHint" style="font-size:12px;color:var(--mist)">Il faut au moins 2 joueurs</span>
+      <span id="startHint" style="font-size:12px;color:var(--mist)">Minimum 2 joueurs</span>
     </div>
   </div>
 </div>
 
-<!-- ══ GAME ══ -->
+<!-- GAME -->
 <div class="screen" id="screenGame">
   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <div class="round-badge">Manche <span class="rn" id="roundNum">1</span>/<span id="roundTotal">5</span></div>
-    <div class="turn-banner" id="turnBanner" style="flex:1">
-      <div class="turn-dot"></div>
-      <span class="turn-who" id="turnWho">—</span>
-      <span class="turn-tag" id="turnTag"></span>
+    <div class="rbadge">Manche <span class="rn" id="roundNum">1</span>/<span id="roundTotal">5</span></div>
+    <div class="tbanner" id="tbanner" style="flex:1">
+      <div class="tdot"></div>
+      <span class="twho" id="twho">—</span>
+      <span class="ttag" id="ttag"></span>
     </div>
   </div>
 
   <!-- Timer -->
-  <div>
-    <div class="timer-num" id="timerNum">10</div>
-    <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar" style="width:100%"></div></div>
+  <div class="timer-wrap">
+    <div class="timer-top">
+      <span class="timer-label">Temps restant</span>
+      <span class="timer-num" id="tnum">15</span>
+    </div>
+    <div class="tbar-bg"><div class="tbar" id="tbar" style="width:100%"></div></div>
   </div>
 
-  <div class="game-cols">
+  <div class="gcols">
     <div>
       <!-- Word -->
-      <div class="word-card">
-        <div class="word-tiles" id="wordTiles"><span class="word-empty">Le mot commence ici...</span></div>
-        <div class="word-meta">
-          <span class="word-len" id="wordLen">0</span> lettres
-          <span id="wordBadge"></span>
-        </div>
+      <div class="wcard">
+        <div class="wtiles" id="wtiles"><span class="wempty">Le mot commence ici...</span></div>
+        <div class="wmeta"><span class="wlen" id="wlen">0</span> lettres<span id="wbadge"></span></div>
       </div>
       <!-- Action -->
-      <div id="actionArea" class="action-card" style="display:none">
-        <div class="card-label">Ajoute ta lettre</div>
-        <div class="big-input-row">
+      <div id="aArea" class="acard" style="display:none">
+        <div class="clabel">Ajoute ta lettre</div>
+        <div class="abig">
           <input type="text" id="letterInput" maxlength="1" placeholder="A" autocomplete="off" spellcheck="false"/>
-          <button class="btn btn-gold" id="btnPlay">Jouer →</button>
+          <button class="btn btn-gold" id="btnPlay" style="flex:1">Jouer →</button>
         </div>
-        <div class="btn-challenge-wrap">
-          <button class="btn btn-challenge" id="btnChallenge" style="width:100%" disabled>⚡ Challenger le mot actuel</button>
-        </div>
+        <button class="btn btn-warn" id="btnChallenge" style="width:100%" disabled>⚡ Challenger ce mot</button>
       </div>
-      <div id="waitingArea" class="waiting-zone">
-        En attente<span class="dots"></span>
-      </div>
+      <div id="wArea" class="wzone" style="display:none">En attente<span class="dots"></span></div>
+      <!-- Log -->
       <div class="card" style="padding:.75rem 1rem">
-        <div class="card-label" style="margin-bottom:.5rem">Journal</div>
-        <div class="game-log" id="gameLog"></div>
+        <div class="clabel" style="margin-bottom:.5rem">Journal</div>
+        <div class="glog" id="glog"></div>
       </div>
     </div>
     <!-- Scores -->
     <div class="card" style="align-self:start">
-      <div class="card-label">Scores</div>
-      <div class="score-list" id="scoreList"></div>
+      <div class="clabel">Scores</div>
+      <div class="slist" id="slist"></div>
     </div>
   </div>
 </div>
 
-</div><!-- /main -->
+</div>
 
 <!-- CHALLENGE OVERLAY -->
-<div class="challenge-overlay" id="chOverlay">
-  <div class="challenge-card">
-    <div class="ch-icon" id="chIcon">⚡</div>
-    <div class="ch-title" id="chTitle">Challenge !</div>
-    <div class="ch-sub" id="chSub"></div>
-    <div class="ch-word" id="chWord"></div>
-    <div class="ch-result" id="chResult"></div>
+<div class="cov" id="cov">
+  <div class="covc">
+    <div class="cico" id="cico">⚡</div>
+    <div class="ctit" id="ctit">Challenge !</div>
+    <div class="csub" id="csub"></div>
+    <div class="cword" id="cword"></div>
+    <div class="cres" id="cres">Vérification...</div>
   </div>
 </div>
 
-<!-- ROUND END OVERLAY -->
-<div class="overlay" id="ovRound">
-  <div class="ov-card">
-    <div class="ov-icon">😬</div>
-    <div class="ov-title" id="ovRTitle">—</div>
-    <div class="ov-sub" id="ovRSub"></div>
-    <div class="ov-word" id="ovRWord"></div>
-    <div class="podium" id="ovRPodium"></div>
-    <div class="btn-row">
-      <button class="btn btn-gold" id="btnNext">Manche suivante →</button>
-    </div>
+<!-- ROUND END -->
+<div class="ov" id="ovR">
+  <div class="ovc">
+    <div class="oico">😬</div>
+    <div class="otit" id="oRtit">—</div>
+    <div class="osub" id="oRsub"></div>
+    <div class="oword" id="oRword"></div>
+    <div class="pod" id="oRpod"></div>
+    <div class="brow"><button class="btn btn-gold" id="btnNext">—</button></div>
+    <p id="hostHint" style="font-size:12px;color:var(--mist);margin-top:8px;display:none">En attente de l'hôte...</p>
   </div>
 </div>
 
-<!-- GAME END OVERLAY -->
-<div class="overlay" id="ovGame">
-  <div class="ov-card">
-    <div class="ov-icon">🏆</div>
-    <div class="ov-title">¡El Pibe de Oro est...</div>
-    <div style="font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;color:var(--gold);margin:.4rem 0 1.2rem" id="ovGWinner">—</div>
-    <div class="podium" id="ovGPodium"></div>
-    <div class="btn-row">
+<!-- GAME END -->
+<div class="ov" id="ovG">
+  <div class="ovc">
+    <div class="oico">🏆</div>
+    <div class="otit">¡El Pibe de Oro est...</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);margin:.4rem 0 1.2rem;letter-spacing:.04em" id="oGwin">—</div>
+    <div class="pod" id="oGpod"></div>
+    <div class="brow">
       <button class="btn btn-gold" id="btnRestart">Rejouer →</button>
-      <button class="btn" id="btnBackLobby">Lobby</button>
+      <button class="btn" id="btnLobby">Lobby</button>
     </div>
   </div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-const AV_COLORS = ['#3B7DD8','#1D9E75','#C85D30','#BA7517','#9B59B6'];
-const socket = io();
-let myId='', myRoom=null, gameState=null;
-const TURN_MAX = 10;
+const AVC=['#3B7DD8','#1D9E75','#C85D30','#9B59B6','#D4AC0D'];
+const socket=io();
+let myId='',myRoom=null,gs=null,TMAX=15;
 
-// ── UTILS ──
 const $=id=>document.getElementById(id);
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
-function avEl(name,i,sz=28){const c=AV_COLORS[i%5];return`<div class="sav" style="background:${c};width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.42)}px">${name[0].toUpperCase()}</div>`}
-function addLog(msg,type=''){const b=$('gameLog');const d=document.createElement('div');d.className='log-line '+type;d.innerHTML=msg;b.prepend(d);while(b.children.length>40)b.removeChild(b.lastChild)}
+function screen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
+function av(name,i,sz=26){return`<div class="sav" style="background:${AVC[i%5]};width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.42)}px">${name[0].toUpperCase()}</div>`}
+function log(msg,t=''){const b=$('glog');const d=document.createElement('div');d.className='ll '+t;d.innerHTML=msg;b.prepend(d);while(b.children.length>40)b.removeChild(b.lastChild)}
 
-// ── TIMER UI ──
-function updateTimerUI(t){
-  $('timerNum').textContent=t;
-  $('timerBar').style.width=`${(t/TURN_MAX)*100}%`;
+// SPLASH
+$('splashBtn').onclick=()=>{$('splash').classList.add('out');setTimeout(()=>$('splash').style.display='none',650)};
+
+// TIMER
+function timerUI(t,max){
+  TMAX=max||TMAX;
+  $('tnum').textContent=t;
+  $('tbar').style.width=`${(t/TMAX)*100}%`;
   const cls=t<=3?'danger':t<=5?'warn':'';
-  $('timerNum').className='timer-num'+(cls?' '+cls:'');
-  $('timerBar').className='timer-bar'+(cls?' '+cls:'');
+  $('tnum').className='timer-num'+(cls?' '+cls:'');
+  $('tbar').className='tbar'+(cls?' '+cls:'');
 }
 
-// ── SOCKET ──
+// SOCKET
 socket.on('connect',()=>{myId=socket.id;$('cdot').classList.add('on');$('connLabel').textContent='Connecté'});
 socket.on('disconnect',()=>{$('cdot').classList.remove('on');$('connLabel').textContent='Déconnecté'});
+
 socket.on('roomsList',rooms=>{
   $('roomCount').textContent=rooms.length?`(${rooms.length})`:'';
   $('roomsList').innerHTML=rooms.length?rooms.map(r=>`
-    <div class="room-item" onclick="quickJoin('${r.code}')">
-      <div class="room-icon">⚽</div>
-      <div><div class="room-name">${r.code}</div><div class="room-count">${r.players}/5 joueurs</div></div>
+    <div class="ritem" onclick="qjoin('${r.code}')">
+      <div class="rico">⚽</div>
+      <div><div class="rname">${r.code}</div><div class="rcnt">${r.players}/5 joueurs</div></div>
       <button class="btn btn-sm" style="margin-left:auto">Rejoindre</button>
-    </div>`).join(''):'<div class="room-empty">Aucun salon actif. Crée le premier !</div>';
+    </div>`).join(''):'<div class="rempty">Aucun salon. Crée le premier !</div>';
 });
 
-socket.on('roomJoined',({room,code})=>{myRoom=code;$('salonCode').textContent=code;showScreen('screenSalon');renderSalon(room)});
+socket.on('roomJoined',({room,code})=>{myRoom=code;$('salonCode').textContent=code;screen('screenSalon');renderSalon(room)});
 socket.on('roomUpdated',room=>{if(myRoom)renderSalon(room)});
 socket.on('error',({message})=>{alert('⚠ '+message)});
 
 socket.on('gameStarted',state=>{
-  gameState=state;
-  showScreen('screenGame');
+  gs=state;
+  screen('screenGame');
   $('roundTotal').textContent=state.totalRounds;
-  $('gameLog').innerHTML='';
-  addLog('La partie commence ! Mots français uniquement, pas de verbes.','good');
+  $('glog').innerHTML='';
+  $('ovR').classList.remove('show');
+  $('cov').classList.remove('show');
+  log('Partie lancée ! Mots français, pas de verbes.','ok');
   renderGame(state);
-  $('chOverlay').classList.remove('show');
 });
-socket.on('gameUpdated',state=>{gameState=state;renderGame(state)});
+socket.on('gameUpdated',state=>{gs=state;renderGame(state)});
 socket.on('letterPlayed',({playerName,letter,word})=>{
-  addLog(`<span class="actor">${playerName}</span> joue <strong style="color:var(--gold);font-family:'Courier Prime',monospace">${letter}</strong> → ${word}`);
-  renderWordTiles(word);
+  log(`<span class="ac">${playerName}</span> joue <strong style="color:var(--gold);font-family:'Courier Prime',monospace">${letter}</strong> → ${word}`);
+  renderTiles(word);
 });
-socket.on('timerTick',({timeLeft})=>updateTimerUI(timeLeft));
-socket.on('timerOut',({playerName})=>{
-  addLog(`⏱ ${playerName} n'a pas joué à temps !`,'ev');
-});
+socket.on('timerTick',({timeLeft,max})=>timerUI(timeLeft,max));
+socket.on('timerOut',({playerName})=>log(`⏱ ${playerName} n'a pas joué à temps !`,'ev'));
 
 socket.on('challengeStarted',({challengerName,challengedName,word})=>{
-  $('chIcon').textContent='⚡';
-  $('chTitle').textContent='Challenge !';
-  $('chSub').textContent=`${challengerName} challenge ${challengedName}`;
-  $('chWord').textContent=word;
-  $('chResult').textContent='Vérification en cours...';
-  $('chResult').className='ch-result';
-  $('chOverlay').classList.add('show');
-  addLog(`⚡ ${challengerName} challenge "${word}"`, 'warn');
+  $('cico').textContent='⚡';$('ctit').textContent='Challenge !';
+  $('csub').textContent=`${challengerName} challenge ${challengedName}`;
+  $('cword').textContent=word;$('cres').textContent='Vérification en cours...';
+  $('cres').className='cres';$('cov').classList.add('show');
+  log(`⚡ ${challengerName} challenge "${word}"`, 'wn');
 });
 socket.on('challengeResult',({word,valid,reason,loserName})=>{
-  $('chIcon').textContent=valid?'✅':'❌';
-  $('chTitle').textContent=valid?'Mot valide !':'Mot invalide !';
-  $('chResult').textContent=reason;
-  $('chResult').className='ch-result '+(loserName?'bad':'good');
-  addLog(reason,'ev');
-  setTimeout(()=>$('chOverlay').classList.remove('show'),2500);
+  $('cico').textContent=valid?'✅':'❌';
+  $('ctit').textContent=valid?'Mot valide !':'Mot invalide !';
+  $('cres').textContent=reason;$('cres').className='cres '+(valid?'good':'bad');
+  log(reason,'ev');
+  setTimeout(()=>$('cov').classList.remove('show'),2500);
 });
 
 socket.on('roundEnded',({loser,word,reason,scores,round,totalRounds})=>{
-  updateTimerUI(0);
-  $('ovRTitle').textContent=loser.name+' perd la manche !';
-  $('ovRSub').textContent=reason||'';
-  $('ovRWord').textContent=word;
-  $('ovRPodium').innerHTML=scores.map((p,i)=>{
-    const isLoser=p.id===loser.id;
-    const gained=isLoser?0:word.length;
-    return`<div class="pod-row ${isLoser?'loser':'first'}">
-      <span class="pod-rank">${i+1}.</span>
-      ${avEl(p.name,i,26)}
-      <span class="pod-name">${p.name}</span>
-      <span class="pod-pts">${p.score}<span class="delta ${gained>0?'p':'z'}"> +${gained}</span></span>
+  timerUI(0);
+  $('oRtit').textContent=loser.name+' perd la manche !';
+  $('oRsub').textContent=reason||'';
+  $('oRword').textContent=word;
+  $('oRpod').innerHTML=scores.map((p,i)=>{
+    const isL=p.id===loser.id,gained=isL?0:word.length;
+    return`<div class="prow ${isL?'loser':'first'}">
+      <span class="prank">${i+1}.</span>${av(p.name,i,24)}
+      <span class="pnm">${p.name}</span>
+      <span class="ppts">${p.score}<span class="dl ${gained>0?'p':'z'}">+${gained}</span></span>
     </div>`;
   }).join('');
-  const isHost=gameState&&gameState.host===myId;
+  const isHost=gs&&gs.host===myId;
+  const isLast=round>=totalRounds;
+  $('btnNext').textContent=isLast?'Classement final →':'Manche suivante →';
   $('btnNext').style.display=isHost?'':'none';
-  $('btnNext').textContent=round>=totalRounds?'Voir le classement →':'Manche suivante →';
+  $('hostHint').style.display=isHost?'none':'block';
   $('btnNext').onclick=()=>{
-    $('ovRound').classList.remove('show');
-    if(round>=totalRounds)socket.emit('requestGameEnd');
+    $('ovR').classList.remove('show');
+    if(isLast)socket.emit('requestGameEnd');
     else socket.emit('nextRound');
   };
-  if(!isHost){
-    const h=$('ovRound').querySelector('.btn-row');
-    if(!h.querySelector('.host-wait')){
-      const p=document.createElement('p');
-      p.className='host-wait';
-      p.style.cssText='font-size:12px;color:var(--mist);margin-top:8px';
-      p.textContent="En attente de l'hôte...";
-      h.appendChild(p);
-    }
-  }
-  $('ovRound').classList.add('show');
+  $('ovR').classList.add('show');
 });
 
 socket.on('gameEnded',({scores})=>{
-  $('ovRound').classList.remove('show');
-  $('ovGWinner').textContent=scores[0].name+' !';
-  $('ovGPodium').innerHTML=scores.map((p,i)=>`
-    <div class="pod-row ${i===0?'first':''}">
-      <span class="pod-rank">${i+1}.</span>
-      ${avEl(p.name,i,26)}
-      <span class="pod-name">${p.name}</span>
-      <span class="pod-pts">${p.score} pts</span>
+  $('ovR').classList.remove('show');
+  $('oGwin').textContent=scores[0].name+' !';
+  $('oGpod').innerHTML=scores.map((p,i)=>`
+    <div class="prow ${i===0?'first':''}">
+      <span class="prank">${i+1}.</span>${av(p.name,i,24)}
+      <span class="pnm">${p.name}</span>
+      <span class="ppts">${p.score} pts</span>
     </div>`).join('');
-  $('ovGame').classList.add('show');
+  $('ovG').classList.add('show');
 });
 
-// ── RENDER ──
+// RENDER
 function renderSalon(room){
   const pl=room.players;
   $('salonCount').textContent=`${pl.length}/5`;
@@ -494,7 +536,7 @@ function renderSalon(room){
     if(!p)return`<div class="pslot empty"><div class="pav">+</div><div class="pname">En attente...</div></div>`;
     const me=p.id===myId;
     return`<div class="pslot ${me?'me':''}">
-      <div class="pav" style="background:${AV_COLORS[i%5]}">${p.name[0].toUpperCase()}</div>
+      <div class="pav" style="background:${AVC[i%5]}">${p.name[0].toUpperCase()}</div>
       <div class="pname">${p.name}</div>
       ${me?'<div class="pbadge">▶ Toi</div>':''}
       ${room.host===p.id?'<div class="pbadge">⭐ Host</div>':''}
@@ -507,84 +549,70 @@ function renderSalon(room){
 }
 
 function renderGame(state){
-  gameState=state;
+  gs=state;
   $('roundNum').textContent=state.round;
   const cur=state.players[state.currentPlayerIndex];
   const isMe=cur&&cur.id===myId;
-  const banner=$('turnBanner');
-  banner.className='turn-banner'+(isMe?' myturn':'');
-  $('turnWho').textContent=cur?cur.name:'—';
-  $('turnTag').textContent=isMe?'▶ À TON TOUR !':'joue...';
-  $('actionArea').style.display=isMe?'':'none';
-  $('waitingArea').style.display=isMe?'none':'';
-  // Challenge dispo si mot >= 2 lettres et pas mon tour ou que je ne suis pas le dernier à avoir joué
-  const lastPlayer=state.wordHistory&&state.wordHistory.length>0?state.wordHistory[state.wordHistory.length-1].playerId:null;
-  $('btnChallenge').disabled=!(state.word.length>=2&&lastPlayer&&lastPlayer!==myId);
+  const b=$('tbanner');
+  b.className='tbanner'+(isMe?' my':'');
+  $('twho').textContent=cur?cur.name:'—';
+  $('ttag').textContent=isMe?'▶ À TON TOUR !':'joue...';
+  $('aArea').style.display=isMe?'':'none';
+  $('wArea').style.display=isMe?'none':'';
+  const last=state.wordHistory&&state.wordHistory.length>0?state.wordHistory[state.wordHistory.length-1].playerId:null;
+  $('btnChallenge').disabled=!(state.word&&state.word.length>=2&&last&&last!==myId);
   if(isMe)setTimeout(()=>$('letterInput').focus(),50);
-  renderWordTiles(state.word||'');
+  renderTiles(state.word||'');
   renderScores(state);
 }
 
-function renderWordTiles(word){
-  const el=$('wordTiles');
-  $('wordLen').textContent=word.length;
-  if(!word){el.innerHTML='<span class="word-empty">Le mot commence ici...</span>';$('wordBadge').innerHTML='';return}
-  el.innerHTML=word.split('').map((l,i)=>{
-    const isNew=i===word.length-1;
-    const hot=word.length>=5;
+function renderTiles(word){
+  $('wlen').textContent=word.length;
+  if(!word){$('wtiles').innerHTML='<span class="wempty">Le mot commence ici...</span>';$('wbadge').innerHTML='';return}
+  $('wtiles').innerHTML=word.split('').map((l,i)=>{
+    const isNew=i===word.length-1,hot=word.length>=5;
     return`<div class="tile${isNew?' new':''}${hot?' hot':''}">${l}</div>`;
   }).join('');
-  $('wordBadge').innerHTML=word.length>=5
-    ?'<span class="badge-warn">⚠ Terminable !</span>'
-    :`<span class="badge-ok">${5-word.length} lettre${5-word.length>1?'s':''} min</span>`;
+  $('wbadge').innerHTML=word.length>=5
+    ?'<span class="bwarn">⚠ Terminable !</span>'
+    :`<span class="bok">${5-word.length} lettre${5-word.length>1?'s':''} min</span>`;
 }
 
 function renderScores(state){
-  $('scoreList').innerHTML=state.players.map((p,i)=>{
+  $('slist').innerHTML=state.players.map((p,i)=>{
     const active=i===state.currentPlayerIndex;
     const sc=state.scores?.find(s=>s.id===p.id)?.score??0;
-    return`<div class="score-row ${active?'active':''}">
-      ${avEl(p.name,i,26)}
-      <span class="sname">${p.name}${p.id===myId?' <span style="color:var(--gold);font-size:10px">(moi)</span>':''}</span>
+    return`<div class="srow ${active?'active':''}">
+      ${av(p.name,i)}
+      <span class="sname">${p.name}${p.id===myId?' <span style="color:var(--gold);font-size:9px">(moi)</span>':''}</span>
       <span class="spts">${sc}</span>
     </div>`;
   }).join('');
 }
 
-// ── ACTIONS ──
-function handleJoin(){
-  const name=$('iName').value.trim();
-  const code=$('iCode').value.trim().toUpperCase();
+// ACTIONS
+function doJoin(){
+  const name=$('iName').value.trim(),code=$('iCode').value.trim().toUpperCase();
   if(!name){alert('Entre ton nom !');return}
   socket.emit('joinRoom',{name,code:code||null});
 }
-function quickJoin(code){$('iCode').value=code;handleJoin()}
+function qjoin(code){$('iCode').value=code;doJoin()}
 
-$('btnJoin').onclick=handleJoin;
-$('btnCreate').onclick=handleJoin;
-$('iName').onkeydown=e=>{if(e.key==='Enter')handleJoin()};
-$('iCode').onkeydown=e=>{if(e.key==='Enter')handleJoin()};
+$('btnJoin').onclick=doJoin;
+$('btnCreate').onclick=doJoin;
+$('iName').onkeydown=e=>{if(e.key==='Enter')doJoin()};
+$('iCode').onkeydown=e=>{if(e.key==='Enter')doJoin()};
 $('iCode').oninput=e=>{e.target.value=e.target.value.toUpperCase()};
-
 $('btnCopy').onclick=()=>{navigator.clipboard.writeText(myRoom);$('btnCopy').textContent='✅ Copié !'};
-$('btnLeave').onclick=()=>{socket.emit('leaveRoom');myRoom=null;showScreen('screenLobby')};
+$('btnLeave').onclick=()=>{socket.emit('leaveRoom');myRoom=null;screen('screenLobby')};
 $('btnStart').onclick=()=>socket.emit('startGame');
-
-$('btnPlay').onclick=playLetter;
-$('letterInput').onkeydown=e=>{if(e.key==='Enter')playLetter()};
+$('btnPlay').onclick=play;
+$('letterInput').onkeydown=e=>{if(e.key==='Enter')play()};
 $('letterInput').oninput=e=>{e.target.value=e.target.value.replace(/[^a-zA-ZàâäéèêëîïôùûüÿçæœÀÂÄÉÈÊËÎÏÔÙÛÜŸÇÆŒ]/g,'').toUpperCase()};
-
-function playLetter(){
-  const inp=$('letterInput');
-  const letter=inp.value.trim().toUpperCase();
-  if(!letter){return}
-  socket.emit('playLetter',{letter});
-  inp.value='';inp.focus();
-}
-
+function play(){const v=$('letterInput').value.trim().toUpperCase();if(!v)return;socket.emit('playLetter',{letter:v});$('letterInput').value='';$('letterInput').focus()}
 $('btnChallenge').onclick=()=>socket.emit('challenge');
 $('btnRestart').onclick=()=>socket.emit('restartGame');
-$('btnBackLobby').onclick=()=>{socket.emit('leaveRoom');myRoom=null;$('ovGame').classList.remove('show');showScreen('screenLobby')};
+$('btnLobby').onclick=()=>{socket.emit('leaveRoom');myRoom=null;$('ovG').classList.remove('show');screen('screenLobby')};
 </script>
 </body>
 </html>
