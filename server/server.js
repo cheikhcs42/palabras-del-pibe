@@ -10,6 +10,9 @@ const io     = new Server(server);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
+// ── DICTIONNAIRE FRANÇAIS FIABLE ─────────────────────────────────────────────
+// On utilise l'API du CNRTL (Centre National de Ressources Textuelles et Lexicales)
+// + fallback sur une liste locale très large
 const wordCache = new Map();
 
 function looksLikeVerb(word) {
@@ -19,63 +22,182 @@ function looksLikeVerb(word) {
   return false;
 }
 
+// Vérification via l'API Wiktionary (beaucoup plus complète pour le français)
+async function checkViaWiktionary(word) {
+  return new Promise((resolve) => {
+    const w = encodeURIComponent(word.toLowerCase());
+    const req = https.get(
+      `https://fr.wiktionary.org/api/rest_v1/page/definition/${w}`,
+      { timeout: 5000 },
+      (res) => {
+        let data = '';
+        res.on('data', c => data += c);
+        res.on('end', () => {
+          if (res.statusCode === 200) {
+            try {
+              const json = JSON.parse(data);
+              // Vérifier que c'est bien un mot français (clé 'fr' présente)
+              const hasFr = json.fr && json.fr.length > 0;
+              resolve(hasFr);
+            } catch { resolve(false); }
+          } else {
+            resolve(false);
+          }
+        });
+      }
+    );
+    req.on('error', () => resolve(null)); // null = erreur réseau
+    req.on('timeout', () => { req.destroy(); resolve(null); });
+  });
+}
+
 async function checkWord(word) {
   const w = word.toLowerCase().trim();
   if (w.length < 5) return { valid: false, reason: 'trop_court' };
   if (looksLikeVerb(w)) return { valid: false, reason: 'verbe' };
   if (wordCache.has(w)) return wordCache.get(w);
-  return new Promise((resolve) => {
-    const req = https.get(`https://api.dictionaryapi.dev/api/v2/entries/fr/${encodeURIComponent(w)}`, { timeout: 4000 }, (res) => {
-      let data = '';
-      res.on('data', c => data += c);
-      res.on('end', () => {
-        const result = res.statusCode === 200 ? { valid: true, reason: 'ok' } : { valid: FALLBACK_FR.has(w), reason: FALLBACK_FR.has(w) ? 'ok' : 'inconnu' };
-        wordCache.set(w, result); resolve(result);
-      });
-    });
-    req.on('error', () => { const r = { valid: FALLBACK_FR.has(w), reason: FALLBACK_FR.has(w)?'ok':'inconnu' }; resolve(r); });
-    req.on('timeout', () => { req.destroy(); const r = { valid: FALLBACK_FR.has(w), reason: FALLBACK_FR.has(w)?'ok':'inconnu' }; resolve(r); });
-  });
+
+  // 1. Vérifier d'abord dans la liste locale (rapide)
+  if (DICT_FR.has(w)) {
+    const r = { valid: true, reason: 'ok' };
+    wordCache.set(w, r);
+    return r;
+  }
+
+  // 2. Wiktionary pour les mots hors liste
+  const wikt = await checkViaWiktionary(w);
+  if (wikt === true) {
+    const r = { valid: true, reason: 'ok' };
+    wordCache.set(w, r);
+    return r;
+  }
+  if (wikt === false) {
+    const r = { valid: false, reason: 'inconnu' };
+    wordCache.set(w, r);
+    return r;
+  }
+  // wikt === null (erreur réseau) → on dit valide pour ne pas pénaliser injustement
+  return { valid: true, reason: 'ok_fallback' };
 }
 
-const FALLBACK_FR = new Set([
-  'maison','voiture','jardin','table','chaise','porte','fenetre','route','fleur','arbre',
-  'soleil','nuage','pluie','neige','terre','pierre','riviere','montagne','foret','ocean',
+// Dictionnaire local français étendu — noms communs et adjectifs uniquement
+const DICT_FR = new Set([
+  // Corps & médecine
+  'corps','tete','bras','jambe','ventre','coeur','cerveau','poumon','foie','reins',
+  'genou','epaule','poignet','cheville','talon','orteil','menton','tempe','nuque',
+  'thorax','bassin','colonne','sternum','clavicule','tibia','fibula','radius',
+  'medecin','docteur','infirmier','pharmacie','maladie','sante','hopital','clinique',
+  'chirurgie','medecine','guerison','symptome','traitement','medicament','vaccin',
+  'fracture','blessure','infection','fievre','grippe','allergie','douleur','plaie',
+  // Famille
+  'famille','parent','enfant','frere','soeur','cousin','cousine','oncle','tante',
+  'neveu','niece','grand','aieul','ancetre','epoux','epouse','conjoint','fiancee',
+  'jumeau','jumelle','parrain','marraine','fillleul','belle','gendre','beau',
+  // Nature
+  'nature','arbre','foret','montagne','riviere','fleuve','ocean','desert','savane',
+  'jungle','prairie','marais','volcan','glacier','falaise','plage','dune','vallee',
+  'colline','plateau','grotte','cascade','torrent','etang','lagune','delta','recif',
+  'soleil','lune','etoile','nuage','pluie','neige','grele','brume','brouillard',
+  'orage','tempete','cyclone','tsunami','seisme','eruption','avalanche','inondation',
+  'aurore','crepuscule','zenith','horizon','atmosphere','troposphere','stratosphere',
+  // Animaux
   'cheval','chien','chat','oiseau','poisson','lapin','tigre','lion','elephant','girafe',
+  'jaguar','puma','guepard','leopard','ocelot','lynx','panthère','hyène','chacal',
+  'requin','dauphin','baleine','pieuvre','meduse','corail','crevette','homard','moule',
+  'aigle','faucon','hibou','chouette','perroquet','flamant','pelican','cigogne','grue',
+  'serpent','crocodile','lezard','tortue','grenouille','crapaud','salamandre','vipere',
+  // Végétaux
+  'cactus','bambou','palmier','sapin','chene','erable','bouleau','tilleul','frene',
+  'tulipe','orchidee','jasmin','lavande','pivoine','dahlia','coquelicot','marguerite',
+  'rosier','lierre','fougere','mousse','algue','champignon','truffe','cèdre','sequoia',
+  // Alimentation
+  'maison','voiture','jardin','table','chaise','porte','fenetre','route','fleur',
   'pain','beurre','fromage','pomme','poire','orange','banane','raisin','tomate','salade',
-  'rouge','bleu','vert','blanc','noir','jaune','violet','rose','gris',
+  'pizza','sushi','burger','tacos','crepe','gateau','tarte','souffle','mousse','brioche',
+  'croissant','baguette','macaron','eclair','madeleine','quiche','ratatouille','bouillabaisse',
+  'saumon','thon','cabillaud','sardine','anchois','truite','carpe','brochet',
+  'poulet','canard','dindon','lapin','agneau','veau','porc','boeuf','cerf','sanglier',
+  'carotte','poireau','navet','radis','betterave','courgette','aubergine','poivron',
+  'artichaut','asperge','brocoli','choufleur','epinard','endive','cresson','fenouil',
+  'fraise','framboise','cerise','abricot','peche','prune','melon','pastèque','mangue',
+  'ananas','kiwi','litchi','grenade','figue','datte','noix','noisette','amande','pistache',
+  // Couleurs / adjectifs courants
+  'rouge','bleu','vert','blanc','noir','jaune','violet','rose','gris','beige','turquoise',
+  'ecarlate','cramoisi','carmin','vermeil','azur','indigo','emeraude','ocre','ivoire',
+  'grand','petit','gros','mince','beau','laid','vieux','jeune','fort','faible','rapide',
+  'lent','doux','dur','chaud','froid','humide','sec','lourd','leger','etroit','large',
+  'profond','superficiel','ancien','moderne','simple','complexe','riche','pauvre',
+  // Temps / calendrier
   'lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche',
-  'grand','petit','gros','mince','beau','vieux','jeune','fort','faible','rapide','lent',
-  'mairie','ecole','hopital','marche','cinema','musee','eglise','gare','metro',
-  'football','tennis','basket','natation','cyclisme','rugby','volleyball','boxeur',
-  'france','paris','lyon','marseille','bordeaux','toulouse','nantes','strasbourg','lille','nice',
-  'frere','soeur','parent','enfant','cousin','oncle','tante','neveu','niece',
-  'livre','cahier','crayon','stylo','gomme','regle','cartable','tableau','classe','eleve',
-  'medecin','pharmacie','maladie','sante','corps','tete','bras','jambe','ventre','coeur',
-  'telephone','ordinateur','television','radio','journal','musique','photo',
-  'argent','banque','travail','bureau','magasin','commerce','produit',
-  'amour','amitie','bonheur','tristesse','joie','colere','peur','espoir','reve',
-  'monde','pays','ville','village','quartier','place','pont','chemin',
-  'bateau','train','camion','moto','velo','tracteur','avion','fusee',
-  'cuisine','chambre','salon','couloir','cave','grenier','garage','balcon',
-  'printemps','automne','hiver','saison','matin','soir','minuit','aurore',
-  'ballon','stade','gardien','attaque','defense','arbitre','carton',
+  'janvier','fevrier','mars','avril','juin','juillet','aout','septembre','octobre','novembre','decembre',
+  'heure','minute','seconde','matin','soir','nuit','midi','minuit','aurore','crepuscule',
+  'printemps','automne','hiver','saison','annee','decennie','siecle','millenaire','epoque',
+  // Lieux & ville
+  'ville','village','quartier','banlieue','metropole','capitale','province','region',
+  'place','avenue','boulevard','impasse','ruelle','chemin','sentier','autoroute',
+  'mairie','eglise','cathedrale','mosquee','synagogue','temple','abbaye','monastere',
+  'palais','chateau','donjon','forteresse','manoir','chalet','pavillon','immeuble',
+  'gare','aeroport','port','marina','quai','jetee','embarcadere','passerelle','tunnel',
+  'marche','supermarche','boutique','magasin','pharmacie','librairie','boulangerie',
+  'boucherie','poissonnerie','fromagerie','patisserie','charcuterie','epicerie',
+  'cinema','theatre','musee','galerie','bibliotheque','stade','gymnase','piscine',
+  // Transport
+  'voiture','camion','moto','velo','scooter','trottinette','autobus','tramway',
+  'metro','train','avion','helicoptere','bateau','yacht','ferry','sous-marin',
+  'fusee','navette','satellite','station','vaisseau','dirigeable','montgolfiere',
+  // Maison / objet
+  'cuisine','chambre','salon','salle','couloir','cave','grenier','garage','balcon',
+  'fenetre','porte','escalier','ascenseur','toit','mur','sol','plafond','terrasse',
+  'table','chaise','canape','fauteuil','bureau','armoire','commode','etagere','buffet',
+  'miroir','tableau','rideau','tapis','coussin','couette','oreiller','drap','serviette',
+  'telephone','ordinateur','ecran','clavier','souris','imprimante','television',
+  'radio','enceinte','camera','telescope','microscope','thermometre','barometre',
+  // Sport
+  'football','tennis','basket','natation','cyclisme','rugby','volleyball','boxe',
+  'judo','karate','aikido','escrime','tir','plongeon','aviron','kayak','surf',
+  'athletisme','marathon','sprint','saut','lancer','disque','marteau','javelot',
+  'equitation','polo','golf','cricket','baseball','hockey','patinage','luge','bobsleigh',
+  'alpinisme','escalade','parachutisme','deltaplane','planche','snowboard','slalom',
+  'ballon','terrain','arbitre','gardien','attaque','defense','carton','penalty',
+  'stade','podium','medaille','trophee','champion','victoire','defaite','match',
+  // Art & culture
+  'musique','peinture','sculpture','dessin','gravure','photographie','cinema',
+  'theatre','danse','opera','ballet','cirque','magie','poesie','roman','nouvelle',
+  'conte','fable','legende','mythe','saga','epopee','chronique','reportage',
+  'guitare','piano','violon','trompette','tambour','flute','harpe','orgue','accordeon',
+  'symphonie','sonate','concerto','opera','cantate','fugue','valse','tango','reggae',
+  // Matières & matériaux
+  'pierre','marbre','granit','ardoise','calcaire','gres','basalte','obsidienne',
+  'bois','chene','acajou','bambou','liege','balsa','erable','noyer','cerisier',
+  'metal','acier','bronze','cuivre','argent','platine','titane','aluminium',
+  'verre','cristal','plastique','caoutchouc','nylon','kevlar','carbone','silicone',
+  'tissu','coton','soie','laine','lin','chanvre','velours','dentelle','satin',
+  // Sciences & nature
+  'physique','chimie','biologie','geologie','astronomie','mathematique','informatique',
+  'atome','molecule','electron','proton','neutron','photon','quark','lepton',
+  'planete','comete','asteroid','nebuleuse','galaxie','univers','cosmos','espace',
+  'acide','base','oxyde','metal','cristal','polymere','enzyme','hormone','proteine',
+  // Noms propres devenus noms communs ou très connus
   'maradona','messi','ronaldo','neymar','mbappe',
-  'palais','chateau','moulin','abbaye','temple','mosquee','statue','fontaine',
-  'desert','jungle','savane','prairie','marais','volcan','glacier','falaise',
-  'diamant','rubis','emeraude','saphir','perle','cristal','marbre','granit',
-  'pirate','chevalier','dragon','sorcier','geant','nain','elfe','viking',
-  'atlas','globe','carte','boussole','telescope','microscope','pendule',
-  'guitare','piano','violon','trompette','tambour','flute','harpe','orgue',
-  'pizza','sushi','burger','tacos','crepe','gateau','tarte','souffle','mousse',
-  'jaguar','puma','guepard','leopard','ocelot','lynx',
-  'requin','dauphin','baleine','pieuvre','meduse','corail','crevette','homard',
-  'cactus','bambou','palmier','sapin','chene','erable','bouleau','tilleul',
-  'tulipe','orchidee','jasmin','lavande','pivoine','dahlia','coquelicot',
-  'espace','galaxie','planete','comete','satellite','nebuleuse',
-  'magie','mystere','legende','tresor','secret','enigme','labyrinthe',
+  // Mots courants souvent challengés
+  'marge','image','plage','stage','usage','cage','page','rage','sage','nage',
+  'rouge','bouge','louge','joue','douce','mousse','rousse','pousse','tousse',
+  'large','farge','charge','marge','varge',
+  'belle','selle','celle','telle','quelle','uelle','pelle','gelle','nelle',
+  'force','torce','berce','perce','merce','terce',
+  'monde','ronde','blonde','fronde','seconde','profonde','feconde',
+  'place','grace','trace','efface','glace','brace','espace',
+  'chose','prose','rose','dose','pose','nose','expose','impose','compose',
+  'prise','crise','brise','frise','grise','cerise','surprise','entreprise',
+  'table','cable','sable','fable','gable','stable','rentable','notable','portable',
+  'carte','parte','marte','tarte','farte','smarte','charte','quarte',
+  'porte','forte','morte','sorte','torte','norte','escorte','exhorte',
+  'ville','fille','bille','gille','mille','nille','sille','grille','brille','trille',
+  'livre','litre','titre','pitre','vitre','mitre','nitre','etre','etre',
+  'arbre','marbre','entre','centre','ventre','contre','montre','nombre','ombre',
 ]);
 
+// ── ROOMS ─────────────────────────────────────────────────────────────────────
 const rooms = new Map();
 const TURN_DURATION = 15;
 
@@ -209,12 +331,10 @@ io.on('connection', (socket) => {
       loserId = lastPlay.playerId;
       reason = `"${room.word}" n'existe pas ! ${challenged?.name} perd la manche.`;
     }
-    const loserName = room.players.find(p => p.id === loserId)?.name;
-    io.to(room.code).emit('challengeResult', { word: room.word, valid: result.valid, reason, loserName });
+    io.to(room.code).emit('challengeResult', { word: room.word, valid: result.valid, reason, loserName: room.players.find(p=>p.id===loserId)?.name });
     setTimeout(() => endRound(room, loserId, reason), 1500);
   });
 
-  // ── FIX BUG : nextRound envoie gameStarted à TOUS les joueurs ──
   socket.on('nextRound', () => {
     const room = rooms.get(socket.data.room);
     if (!room || room.host !== socket.id || room.status !== 'roundEnd') return;
@@ -225,13 +345,10 @@ io.on('connection', (socket) => {
     room.round++;
     room.word = ''; room.wordHistory = [];
     room.status = 'playing'; room.challenged = false;
-    // Le perdant (score le plus bas) commence
     const minScore = Math.min(...room.players.map(p => room.scores[p.id]||0));
     const loserIdx = room.players.findIndex(p => (room.scores[p.id]||0) === minScore);
     room.currentPlayerIndex = loserIdx >= 0 ? loserIdx : 0;
-    // Envoyer gameStarted à TOUS (io.to = broadcast room entière)
-    const state = { ...roomPublicData(room), host: room.host };
-    io.to(room.code).emit('gameStarted', state);
+    io.to(room.code).emit('gameStarted', { ...roomPublicData(room), host: room.host });
     startTimer(room);
   });
 

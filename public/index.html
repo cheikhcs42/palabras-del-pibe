@@ -348,7 +348,7 @@ input::placeholder{color:var(--mist)}
       <!-- Word -->
       <div class="wcard">
         <div class="wtiles" id="wtiles"><span class="wempty">Le mot commence ici...</span></div>
-        <div class="wmeta"><span class="wlen" id="wlen">0</span> lettres<span id="wbadge"></span></div>
+        <div class="wmeta"><span class="wlen" id="wlen">0</span> lettres</div>
       </div>
       <!-- Action -->
       <div id="aArea" class="acard" style="display:none">
@@ -570,12 +570,9 @@ function renderTiles(word){
   $('wlen').textContent=word.length;
   if(!word){$('wtiles').innerHTML='<span class="wempty">Le mot commence ici...</span>';$('wbadge').innerHTML='';return}
   $('wtiles').innerHTML=word.split('').map((l,i)=>{
-    const isNew=i===word.length-1,hot=word.length>=5;
-    return`<div class="tile${isNew?' new':''}${hot?' hot':''}">${l}</div>`;
+    const isNew=i===word.length-1;
+    return`<div class="tile${isNew?' new':''}">${l}</div>`;
   }).join('');
-  $('wbadge').innerHTML=word.length>=5
-    ?'<span class="bwarn">⚠ Terminable !</span>'
-    :`<span class="bok">${5-word.length} lettre${5-word.length>1?'s':''} min</span>`;
 }
 
 function renderScores(state){
