@@ -10,94 +10,49 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --ink:#07090f;--deep:#0b0f1c;--panel:#111827;--card:#161f33;--rim:#1e2d4a;
-  --gold:#f5c518;--gold2:#c9a200;--silver:#c2d0e8;--mist:#5d738f;
-  --red:#e63946;--green:#2dc653;--warn:#f4a261;
-  --r:8px;
+  --gold:#f5c518;--silver:#c2d0e8;--mist:#5d738f;
+  --red:#e63946;--green:#2dc653;--warn:#f4a261;--r:8px;
 }
 html,body{min-height:100%;background:var(--ink);color:var(--silver);font-family:'Inter',sans-serif;overflow-x:hidden}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--rim)}
 
-/* ── SPLASH ── */
-#splash{
-  position:fixed;inset:0;z-index:999;
-  background:var(--ink);
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  overflow:hidden;
-  transition:opacity .6s ease;
-}
+/* SPLASH */
+#splash{position:fixed;inset:0;z-index:999;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;overflow:hidden;transition:opacity .6s ease}
 #splash.out{opacity:0;pointer-events:none}
-.splash-photo{
-  position:absolute;inset:0;
-  background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Maradona-Mundial_86_con_la_copa.JPG/800px-Maradona-Mundial_86_con_la_copa.JPG') center top/cover no-repeat;
-  opacity:.55;
-}
-.splash-grad{
-  position:absolute;inset:0;
-  background:linear-gradient(to top,rgba(7,9,15,1) 0%,rgba(7,9,15,.7) 40%,rgba(7,9,15,.1) 100%);
-}
-.splash-content{
-  position:relative;z-index:2;
-  text-align:center;padding:0 1.5rem 3rem;
-  width:100%;max-width:520px;
-}
-.splash-eyebrow{
-  font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
-  color:var(--gold);margin-bottom:.75rem;
-}
-.splash-title{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(52px,12vw,96px);
-  line-height:.92;color:#fff;
-  text-shadow:0 0 80px rgba(245,197,24,.2);
-  margin-bottom:.3rem;
-}
+.splash-photo{position:absolute;inset:0;background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Maradona-Mundial_86_con_la_copa.JPG/800px-Maradona-Mundial_86_con_la_copa.JPG') center top/cover no-repeat;opacity:.55}
+.splash-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(7,9,15,1) 0%,rgba(7,9,15,.7) 40%,rgba(7,9,15,.1) 100%)}
+.splash-content{position:relative;z-index:2;text-align:center;padding:0 1.5rem 3rem;width:100%;max-width:520px}
+.splash-eye{font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem}
+.splash-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,12vw,96px);line-height:.92;color:#fff;text-shadow:0 0 80px rgba(245,197,24,.2);margin-bottom:.3rem}
 .splash-title .acc{color:var(--gold)}
 .splash-sub{font-size:13px;color:var(--mist);margin-bottom:2rem;line-height:1.5}
-.splash-btn{
-  font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;
-  background:var(--gold);color:#000;border:none;
-  padding:14px 48px;border-radius:50px;cursor:pointer;
-  transition:transform .15s,background .15s;
-}
+.splash-btn{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.1em;background:var(--gold);color:#000;border:none;padding:14px 48px;border-radius:50px;cursor:pointer;transition:transform .15s,background .15s}
 .splash-btn:hover{background:#ffd830;transform:scale(1.04)}
 .splash-btn:active{transform:scale(.97)}
 
-/* ── HEADER ── */
-.header{
-  background:var(--deep);border-bottom:1px solid var(--rim);
-  display:flex;align-items:center;gap:12px;
-  padding:.75rem 1.25rem;position:sticky;top:0;z-index:50;
-}
-.header-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:.05em}
-.header-logo span{color:var(--gold)}
-.conn-wrap{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mist);margin-left:auto}
+/* HEADER */
+.header{background:var(--deep);border-bottom:1px solid var(--rim);display:flex;align-items:center;gap:12px;padding:.75rem 1.25rem;position:sticky;top:0;z-index:50}
+.hlogo{font-family:'Bebas Neue',sans-serif;font-size:20px;color:#fff;letter-spacing:.05em}
+.hlogo span{color:var(--gold)}
+.conn{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--mist);margin-left:auto}
 .cdot{width:7px;height:7px;border-radius:50%;background:var(--red);transition:background .3s}
 .cdot.on{background:var(--green)}
 
-/* ── MAIN ── */
+/* MAIN */
 .main{max-width:860px;margin:0 auto;padding:1.25rem 1rem 4rem;display:flex;flex-direction:column;gap:1rem}
 .screen{display:none;flex-direction:column;gap:1rem}
 .screen.active{display:flex}
 
-/* ── CARDS ── */
+/* CARDS */
 .card{background:var(--card);border:1px solid var(--rim);border-radius:12px;padding:1.25rem 1.5rem}
 .clabel{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mist);margin-bottom:.75rem}
 .clabel .g{color:var(--gold)}
 
-/* ── INPUTS & BUTTONS ── */
-input[type=text]{
-  background:var(--deep);border:1px solid var(--rim);border-radius:var(--r);
-  color:var(--silver);font-family:'Inter',sans-serif;font-size:14px;
-  padding:10px 14px;outline:none;width:100%;transition:border-color .2s;
-}
+/* INPUTS & BUTTONS */
+input[type=text]{background:var(--deep);border:1px solid var(--rim);border-radius:var(--r);color:var(--silver);font-family:'Inter',sans-serif;font-size:14px;padding:10px 14px;outline:none;width:100%;transition:border-color .2s}
 input[type=text]:focus{border-color:var(--gold)}
 input::placeholder{color:var(--mist)}
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.06em;
-  padding:10px 20px;border-radius:var(--r);border:1px solid var(--rim);
-  background:transparent;color:var(--silver);cursor:pointer;transition:all .2s;white-space:nowrap;
-}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:.06em;padding:10px 20px;border-radius:var(--r);border:1px solid var(--rim);background:transparent;color:var(--silver);cursor:pointer;transition:all .2s;white-space:nowrap}
 .btn:hover{background:var(--panel);border-color:var(--silver)}
 .btn:active{transform:scale(.97)}
 .btn:disabled{opacity:.35;cursor:default;pointer-events:none}
@@ -109,7 +64,7 @@ input::placeholder{color:var(--mist)}
 .btn-warn:hover{background:rgba(244,162,97,.1)}
 .btn-sm{font-size:13px;padding:6px 12px}
 
-/* ── LOBBY ── */
+/* LOBBY */
 .lgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 @media(max-width:560px){.lgrid{grid-template-columns:1fr}}
 .jform{display:flex;flex-direction:column;gap:.65rem}
@@ -128,19 +83,19 @@ input::placeholder{color:var(--mist)}
 .rnum{width:21px;height:21px;border-radius:50%;background:rgba(245,197,24,.1);border:1px solid rgba(245,197,24,.3);color:var(--gold);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
 .rtext{font-size:12px;color:var(--mist);line-height:1.5}
 
-/* ── SALON ── */
+/* SALON */
 .salon-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;margin-bottom:1rem}
 .salon-code{font-family:'Courier Prime',monospace;font-size:28px;font-weight:700;color:var(--gold);letter-spacing:.3em;background:var(--deep);border:1px solid rgba(245,197,24,.3);border-radius:var(--r);padding:7px 18px;display:inline-block}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:7px;margin-bottom:1rem}
 .pslot{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 8px;background:var(--panel);border:1px solid var(--rim);border-radius:var(--r);text-align:center}
 .pslot.me{border-color:var(--gold)}
 .pslot.empty{opacity:.4;border-style:dashed}
-.pav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:19px;color:#000;flex-shrink:0}
+.pav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:19px;color:#000}
 .pslot.empty .pav{background:var(--rim)!important;color:var(--mist);font-size:16px}
 .pname{font-size:12px;font-weight:600;color:var(--silver)}
 .pbadge{font-size:10px;color:var(--gold)}
 
-/* ── GAME ── */
+/* GAME */
 .gcols{display:grid;grid-template-columns:1fr 230px;gap:1rem}
 @media(max-width:620px){.gcols{grid-template-columns:1fr}}
 
@@ -168,25 +123,19 @@ input::placeholder{color:var(--mist)}
 /* Word */
 .wcard{background:var(--deep);border:1px solid var(--rim);border-radius:12px;padding:1.5rem;text-align:center;margin-bottom:.75rem}
 .wtiles{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px;min-height:62px}
-.tile{
-  width:46px;height:54px;background:var(--card);border:1px solid var(--rim);border-radius:5px;
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Courier Prime',monospace;font-size:22px;font-weight:700;color:#fff;
-  animation:tdrop .22s cubic-bezier(.34,1.56,.64,1);
-}
+.tile{width:46px;height:54px;background:var(--card);border:1px solid var(--rim);border-radius:5px;display:flex;align-items:center;justify-content:center;font-family:'Courier Prime',monospace;font-size:22px;font-weight:700;color:#fff;animation:tdrop .22s cubic-bezier(.34,1.56,.64,1)}
 .tile.new{border-color:var(--gold);color:var(--gold)}
-.tile.hot{border-color:var(--red);color:var(--red)}
 @keyframes tdrop{from{transform:translateY(-16px);opacity:0}to{transform:translateY(0);opacity:1}}
 .wempty{color:var(--mist);font-size:13px;font-style:italic}
 .wmeta{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:.75rem}
 .wlen{font-family:'Courier Prime',monospace;font-size:19px;font-weight:700;color:var(--silver)}
-.bwarn{background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.3);color:var(--red);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
-.bok{background:rgba(45,198,83,.08);border:1px solid rgba(45,198,83,.2);color:var(--green);font-size:11px;padding:2px 8px;border-radius:20px}
 
 /* Action */
 .acard{display:flex;flex-direction:column;gap:.6rem;margin-bottom:.75rem}
 .abig{display:flex;gap:8px;align-items:stretch}
 .abig input{width:70px;text-align:center;font-family:'Courier Prime',monospace;font-size:28px;font-weight:700;text-transform:uppercase;padding:4px}
+.action-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.finish-hint{font-size:11px;color:var(--mist);text-align:center;line-height:1.4;padding:4px 0}
 .wzone{text-align:center;padding:1.25rem;color:var(--mist);font-size:13px;border:1px dashed var(--rim);border-radius:var(--r);margin-bottom:.75rem}
 .dots::after{content:'...';animation:da 1.2s step-start infinite}
 @keyframes da{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
@@ -224,7 +173,7 @@ input::placeholder{color:var(--mist)}
 .cres.bad{color:var(--red)}
 .cres.good{color:var(--green)}
 
-/* Overlay round/game */
+/* Round/Game overlay */
 .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .ov.show{display:flex}
 .ovc{background:var(--card);border:1px solid var(--rim);border-radius:16px;padding:1.75rem;max-width:380px;width:92%;animation:tdrop .3s ease;text-align:center}
@@ -252,17 +201,17 @@ input::placeholder{color:var(--mist)}
   <div class="splash-photo"></div>
   <div class="splash-grad"></div>
   <div class="splash-content">
-    <div class="splash-eyebrow">⚽ Jeu de lettres multijoueur · Mots français</div>
+    <div class="splash-eye">&#9917; Jeu de lettres multijoueur &middot; Mots fran&ccedil;ais</div>
     <div class="splash-title">Las Palabras<br/>del <span class="acc">Pibe<br/>de Oro</span></div>
     <div class="splash-sub">Construis des mots avec tes amis.<br/>Pas de verbes. 15 secondes par tour.</div>
-    <button class="splash-btn" id="splashBtn">JOUER →</button>
+    <button class="splash-btn" id="splashBtn">JOUER &rarr;</button>
   </div>
 </div>
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-logo">Las Palabras del <span>Pibe de Oro</span></div>
-  <div class="conn-wrap"><span class="cdot" id="cdot"></span><span id="connLabel">Connexion...</span></div>
+  <div class="hlogo">Las Palabras del <span>Pibe de Oro</span></div>
+  <div class="conn"><span class="cdot" id="cdot"></span><span id="connLabel">Connexion...</span></div>
 </div>
 
 <div class="main">
@@ -271,17 +220,17 @@ input::placeholder{color:var(--mist)}
 <div class="screen active" id="screenLobby">
   <div class="lgrid">
     <div class="card">
-      <div class="clabel">Créer ou rejoindre</div>
+      <div class="clabel">Cr&eacute;er ou rejoindre</div>
       <div class="jform">
         <div><label>Ton nom</label><input type="text" id="iName" placeholder="ex: El Diego" maxlength="14"/></div>
         <div>
-          <label>Code salon (vide = créer)</label>
+          <label>Code salon (vide = cr&eacute;er)</label>
           <div class="jrow">
             <input type="text" id="iCode" placeholder="AB3C" maxlength="4" style="font-family:'Courier Prime',monospace;letter-spacing:.2em;text-transform:uppercase"/>
-            <button class="btn btn-gold" id="btnJoin">Entrer →</button>
+            <button class="btn btn-gold" id="btnJoin">Entrer &rarr;</button>
           </div>
         </div>
-        <button class="btn btn-gold" id="btnCreate">+ Créer un salon</button>
+        <button class="btn btn-gold" id="btnCreate">+ Cr&eacute;er un salon</button>
       </div>
     </div>
     <div class="card">
@@ -290,13 +239,14 @@ input::placeholder{color:var(--mist)}
     </div>
   </div>
   <div class="card">
-    <div class="clabel">Règles</div>
+    <div class="clabel">R&egrave;gles</div>
     <div class="rules-grid">
-      <div class="ri"><div class="rnum">1</div><div class="rtext">Ajoute une lettre pour former un <strong style="color:var(--silver)">mot français</strong>.</div></div>
+      <div class="ri"><div class="rnum">1</div><div class="rtext">Ajoute une lettre pour former un <strong style="color:var(--silver)">mot fran&ccedil;ais</strong>.</div></div>
       <div class="ri"><div class="rnum">2</div><div class="rtext">Minimum <strong style="color:var(--silver)">5 lettres</strong>. <strong style="color:var(--red)">Les verbes sont interdits.</strong></div></div>
       <div class="ri"><div class="rnum">3</div><div class="rtext"><strong style="color:var(--gold)">15 secondes</strong> pour jouer, sinon tu perds la manche.</div></div>
-      <div class="ri"><div class="rnum">4</div><div class="rtext"><strong style="color:var(--warn)">Challenge</strong> : mot valide → challengeur perd. Mot faux → l'autre perd.</div></div>
-      <div class="ri"><div class="rnum">5</div><div class="rtext">Perdant = <strong style="color:var(--red)">0 pt</strong>. Autres gagnent autant de pts que le nombre de lettres.</div></div>
+      <div class="ri"><div class="rnum">4</div><div class="rtext"><strong style="color:var(--warn)">Challenge</strong> : mot valide &rarr; challengeur perd. Mot faux &rarr; l'autre perd.</div></div>
+      <div class="ri"><div class="rnum">5</div><div class="rtext"><strong style="color:var(--red)">Terminer ici</strong> : joue ta lettre et ferme le mot volontairement. Tu perds 0 pt mais limites les d&eacute;g&acirc;ts.</div></div>
+      <div class="ri"><div class="rnum">6</div><div class="rtext">Perdant = <strong style="color:var(--red)">0 pt</strong>. Autres gagnent autant de pts que le nombre de lettres.</div></div>
     </div>
   </div>
 </div>
@@ -310,14 +260,14 @@ input::placeholder{color:var(--mist)}
         <div class="salon-code" id="salonCode">----</div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-sm" id="btnCopy">📋 Copier</button>
+        <button class="btn btn-sm" id="btnCopy">&#128203; Copier</button>
         <button class="btn btn-red btn-sm" id="btnLeave">Quitter</button>
       </div>
     </div>
     <div class="clabel">Joueurs <span id="salonCount" style="color:var(--gold)">0/5</span></div>
     <div class="pgrid" id="salonPlayers"></div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-gold" id="btnStart" disabled>Démarrer →</button>
+      <button class="btn btn-gold" id="btnStart" disabled>D&eacute;marrer &rarr;</button>
       <span id="startHint" style="font-size:12px;color:var(--mist)">Minimum 2 joueurs</span>
     </div>
   </div>
@@ -329,12 +279,11 @@ input::placeholder{color:var(--mist)}
     <div class="rbadge">Manche <span class="rn" id="roundNum">1</span>/<span id="roundTotal">5</span></div>
     <div class="tbanner" id="tbanner" style="flex:1">
       <div class="tdot"></div>
-      <span class="twho" id="twho">—</span>
+      <span class="twho" id="twho">&mdash;</span>
       <span class="ttag" id="ttag"></span>
     </div>
   </div>
 
-  <!-- Timer -->
   <div class="timer-wrap">
     <div class="timer-top">
       <span class="timer-label">Temps restant</span>
@@ -345,28 +294,35 @@ input::placeholder{color:var(--mist)}
 
   <div class="gcols">
     <div>
-      <!-- Word -->
       <div class="wcard">
         <div class="wtiles" id="wtiles"><span class="wempty">Le mot commence ici...</span></div>
         <div class="wmeta"><span class="wlen" id="wlen">0</span> lettres</div>
       </div>
-      <!-- Action -->
+
+      <!-- ACTION : ton tour -->
       <div id="aArea" class="acard" style="display:none">
         <div class="clabel">Ajoute ta lettre</div>
         <div class="abig">
           <input type="text" id="letterInput" maxlength="1" placeholder="A" autocomplete="off" spellcheck="false"/>
-          <button class="btn btn-gold" id="btnPlay" style="flex:1">Jouer →</button>
+          <button class="btn btn-gold" id="btnPlay" style="flex:1">Jouer &rarr;</button>
         </div>
-        <button class="btn btn-warn" id="btnChallenge" style="width:100%" disabled>⚡ Challenger ce mot</button>
+        <div class="action-btns">
+          <button class="btn btn-red" id="btnFinish" disabled>&#128282; Terminer ici</button>
+          <button class="btn btn-warn" id="btnChallenge" disabled>&#9889; Challenger</button>
+        </div>
+        <div class="finish-hint" id="finishHint" style="display:none">
+          Joue ta lettre et fermes le mot &mdash; tu perds 0 pt mais les autres gagnent moins
+        </div>
       </div>
+
+      <!-- Attente -->
       <div id="wArea" class="wzone" style="display:none">En attente<span class="dots"></span></div>
-      <!-- Log -->
+
       <div class="card" style="padding:.75rem 1rem">
         <div class="clabel" style="margin-bottom:.5rem">Journal</div>
         <div class="glog" id="glog"></div>
       </div>
     </div>
-    <!-- Scores -->
     <div class="card" style="align-self:start">
       <div class="clabel">Scores</div>
       <div class="slist" id="slist"></div>
@@ -379,36 +335,36 @@ input::placeholder{color:var(--mist)}
 <!-- CHALLENGE OVERLAY -->
 <div class="cov" id="cov">
   <div class="covc">
-    <div class="cico" id="cico">⚡</div>
+    <div class="cico" id="cico">&#9889;</div>
     <div class="ctit" id="ctit">Challenge !</div>
     <div class="csub" id="csub"></div>
     <div class="cword" id="cword"></div>
-    <div class="cres" id="cres">Vérification...</div>
+    <div class="cres" id="cres">V&eacute;rification...</div>
   </div>
 </div>
 
 <!-- ROUND END -->
 <div class="ov" id="ovR">
   <div class="ovc">
-    <div class="oico">😬</div>
-    <div class="otit" id="oRtit">—</div>
+    <div class="oico" id="oRico">&#128556;</div>
+    <div class="otit" id="oRtit">&mdash;</div>
     <div class="osub" id="oRsub"></div>
     <div class="oword" id="oRword"></div>
     <div class="pod" id="oRpod"></div>
-    <div class="brow"><button class="btn btn-gold" id="btnNext">—</button></div>
-    <p id="hostHint" style="font-size:12px;color:var(--mist);margin-top:8px;display:none">En attente de l'hôte...</p>
+    <div class="brow"><button class="btn btn-gold" id="btnNext">&mdash;</button></div>
+    <p id="hostHint" style="font-size:12px;color:var(--mist);margin-top:8px;display:none">En attente de l'h&ocirc;te...</p>
   </div>
 </div>
 
 <!-- GAME END -->
 <div class="ov" id="ovG">
   <div class="ovc">
-    <div class="oico">🏆</div>
-    <div class="otit">¡El Pibe de Oro est...</div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);margin:.4rem 0 1.2rem;letter-spacing:.04em" id="oGwin">—</div>
+    <div class="oico">&#127942;</div>
+    <div class="otit">&iexcl;El Pibe de Oro est...</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--gold);margin:.4rem 0 1.2rem;letter-spacing:.04em" id="oGwin">&mdash;</div>
     <div class="pod" id="oGpod"></div>
     <div class="brow">
-      <button class="btn btn-gold" id="btnRestart">Rejouer →</button>
+      <button class="btn btn-gold" id="btnRestart">Rejouer &rarr;</button>
       <button class="btn" id="btnLobby">Lobby</button>
     </div>
   </div>
@@ -425,10 +381,8 @@ function screen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.
 function av(name,i,sz=26){return`<div class="sav" style="background:${AVC[i%5]};width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.42)}px">${name[0].toUpperCase()}</div>`}
 function log(msg,t=''){const b=$('glog');const d=document.createElement('div');d.className='ll '+t;d.innerHTML=msg;b.prepend(d);while(b.children.length>40)b.removeChild(b.lastChild)}
 
-// SPLASH
 $('splashBtn').onclick=()=>{$('splash').classList.add('out');setTimeout(()=>$('splash').style.display='none',650)};
 
-// TIMER
 function timerUI(t,max){
   TMAX=max||TMAX;
   $('tnum').textContent=t;
@@ -438,60 +392,58 @@ function timerUI(t,max){
   $('tbar').className='tbar'+(cls?' '+cls:'');
 }
 
-// SOCKET
-socket.on('connect',()=>{myId=socket.id;$('cdot').classList.add('on');$('connLabel').textContent='Connecté'});
-socket.on('disconnect',()=>{$('cdot').classList.remove('on');$('connLabel').textContent='Déconnecté'});
+socket.on('connect',()=>{myId=socket.id;$('cdot').classList.add('on');$('connLabel').textContent='Connect\u00e9'});
+socket.on('disconnect',()=>{$('cdot').classList.remove('on');$('connLabel').textContent='D\u00e9connect\u00e9'});
 
 socket.on('roomsList',rooms=>{
   $('roomCount').textContent=rooms.length?`(${rooms.length})`:'';
   $('roomsList').innerHTML=rooms.length?rooms.map(r=>`
     <div class="ritem" onclick="qjoin('${r.code}')">
-      <div class="rico">⚽</div>
+      <div class="rico">&#9917;</div>
       <div><div class="rname">${r.code}</div><div class="rcnt">${r.players}/5 joueurs</div></div>
       <button class="btn btn-sm" style="margin-left:auto">Rejoindre</button>
-    </div>`).join(''):'<div class="rempty">Aucun salon. Crée le premier !</div>';
+    </div>`).join(''):'<div class="rempty">Aucun salon. Cr\u00e9e le premier !</div>';
 });
 
 socket.on('roomJoined',({room,code})=>{myRoom=code;$('salonCode').textContent=code;screen('screenSalon');renderSalon(room)});
 socket.on('roomUpdated',room=>{if(myRoom)renderSalon(room)});
-socket.on('error',({message})=>{alert('⚠ '+message)});
+socket.on('error',({message})=>{alert('\u26a0 '+message)});
 
 socket.on('gameStarted',state=>{
-  gs=state;
-  screen('screenGame');
+  gs=state;screen('screenGame');
   $('roundTotal').textContent=state.totalRounds;
   $('glog').innerHTML='';
-  $('ovR').classList.remove('show');
-  $('cov').classList.remove('show');
-  log('Partie lancée ! Mots français, pas de verbes.','ok');
+  $('ovR').classList.remove('show');$('cov').classList.remove('show');
+  log('Partie lanc\u00e9e ! Mots fran\u00e7ais, pas de verbes.','ok');
   renderGame(state);
 });
 socket.on('gameUpdated',state=>{gs=state;renderGame(state)});
 socket.on('letterPlayed',({playerName,letter,word})=>{
-  log(`<span class="ac">${playerName}</span> joue <strong style="color:var(--gold);font-family:'Courier Prime',monospace">${letter}</strong> → ${word}`);
+  log(`<span class="ac">${playerName}</span> joue <strong style="color:var(--gold);font-family:'Courier Prime',monospace">${letter}</strong> \u2192 ${word}`);
   renderTiles(word);
 });
 socket.on('timerTick',({timeLeft,max})=>timerUI(timeLeft,max));
-socket.on('timerOut',({playerName})=>log(`⏱ ${playerName} n'a pas joué à temps !`,'ev'));
+socket.on('timerOut',({playerName})=>log(`\u23f1 ${playerName} n'a pas jou\u00e9 \u00e0 temps !`,'ev'));
 
 socket.on('challengeStarted',({challengerName,challengedName,word})=>{
-  $('cico').textContent='⚡';$('ctit').textContent='Challenge !';
+  $('cico').textContent='\u26a1';$('ctit').textContent='Challenge !';
   $('csub').textContent=`${challengerName} challenge ${challengedName}`;
-  $('cword').textContent=word;$('cres').textContent='Vérification en cours...';
+  $('cword').textContent=word;$('cres').textContent='V\u00e9rification en cours...';
   $('cres').className='cres';$('cov').classList.add('show');
-  log(`⚡ ${challengerName} challenge "${word}"`, 'wn');
+  log(`\u26a1 ${challengerName} challenge "${word}"`, 'wn');
 });
 socket.on('challengeResult',({word,valid,reason,loserName})=>{
-  $('cico').textContent=valid?'✅':'❌';
+  $('cico').textContent=valid?'\u2705':'\u274c';
   $('ctit').textContent=valid?'Mot valide !':'Mot invalide !';
   $('cres').textContent=reason;$('cres').className='cres '+(valid?'good':'bad');
   log(reason,'ev');
   setTimeout(()=>$('cov').classList.remove('show'),2500);
 });
 
-socket.on('roundEnded',({loser,word,reason,scores,round,totalRounds})=>{
+socket.on('roundEnded',({loser,word,reason,scores,round,totalRounds,voluntary})=>{
   timerUI(0);
-  $('oRtit').textContent=loser.name+' perd la manche !';
+  $('oRico').textContent=voluntary?'\ud83d\udd1a':'\ud83d\ude2c';
+  $('oRtit').textContent=loser.name+(voluntary?' termine volontairement !':" perd la manche !");
   $('oRsub').textContent=reason||'';
   $('oRword').textContent=word;
   $('oRpod').innerHTML=scores.map((p,i)=>{
@@ -502,9 +454,8 @@ socket.on('roundEnded',({loser,word,reason,scores,round,totalRounds})=>{
       <span class="ppts">${p.score}<span class="dl ${gained>0?'p':'z'}">+${gained}</span></span>
     </div>`;
   }).join('');
-  const isHost=gs&&gs.host===myId;
-  const isLast=round>=totalRounds;
-  $('btnNext').textContent=isLast?'Classement final →':'Manche suivante →';
+  const isHost=gs&&gs.host===myId,isLast=round>=totalRounds;
+  $('btnNext').textContent=isLast?'Classement final \u2192':'Manche suivante \u2192';
   $('btnNext').style.display=isHost?'':'none';
   $('hostHint').style.display=isHost?'none':'block';
   $('btnNext').onclick=()=>{
@@ -527,7 +478,6 @@ socket.on('gameEnded',({scores})=>{
   $('ovG').classList.add('show');
 });
 
-// RENDER
 function renderSalon(room){
   const pl=room.players;
   $('salonCount').textContent=`${pl.length}/5`;
@@ -538,14 +488,14 @@ function renderSalon(room){
     return`<div class="pslot ${me?'me':''}">
       <div class="pav" style="background:${AVC[i%5]}">${p.name[0].toUpperCase()}</div>
       <div class="pname">${p.name}</div>
-      ${me?'<div class="pbadge">▶ Toi</div>':''}
-      ${room.host===p.id?'<div class="pbadge">⭐ Host</div>':''}
+      ${me?'<div class="pbadge">\u25b6 Toi</div>':''}
+      ${room.host===p.id?'<div class="pbadge">\u2b50 Host</div>':''}
     </div>`;
   }).join('');
   const isHost=room.host===myId;
   $('btnStart').disabled=!(pl.length>=2&&isHost);
   $('btnStart').style.display=isHost?'':'none';
-  $('startHint').textContent=!isHost?`En attente de l'hôte`:pl.length<2?'Minimum 2 joueurs':'Prêt !';
+  $('startHint').textContent=!isHost?`En attente de l'h\u00f4te`:pl.length<2?'Minimum 2 joueurs':'Pr\u00eat !';
 }
 
 function renderGame(state){
@@ -555,12 +505,20 @@ function renderGame(state){
   const isMe=cur&&cur.id===myId;
   const b=$('tbanner');
   b.className='tbanner'+(isMe?' my':'');
-  $('twho').textContent=cur?cur.name:'—';
-  $('ttag').textContent=isMe?'▶ À TON TOUR !':'joue...';
+  $('twho').textContent=cur?cur.name:'\u2014';
+  $('ttag').textContent=isMe?'\u25b6 \u00c0 TON TOUR !':'joue...';
   $('aArea').style.display=isMe?'':'none';
   $('wArea').style.display=isMe?'none':'';
+
+  // Boutons : disponibles seulement si mot >= 5 lettres (pour Terminer) ou >= 2 lettres (Challenge)
   const last=state.wordHistory&&state.wordHistory.length>0?state.wordHistory[state.wordHistory.length-1].playerId:null;
-  $('btnChallenge').disabled=!(state.word&&state.word.length>=2&&last&&last!==myId);
+  const canChallenge=!!(state.word&&state.word.length>=2&&last&&last!==myId);
+  const canFinish=isMe&&state.word&&state.word.length>=4; // 4+ lettres car on va en ajouter une
+
+  $('btnChallenge').disabled=!canChallenge;
+  $('btnFinish').disabled=!canFinish;
+  $('finishHint').style.display=canFinish?'block':'none';
+
   if(isMe)setTimeout(()=>$('letterInput').focus(),50);
   renderTiles(state.word||'');
   renderScores(state);
@@ -568,7 +526,7 @@ function renderGame(state){
 
 function renderTiles(word){
   $('wlen').textContent=word.length;
-  if(!word){$('wtiles').innerHTML='<span class="wempty">Le mot commence ici...</span>';$('wbadge').innerHTML='';return}
+  if(!word){$('wtiles').innerHTML='<span class="wempty">Le mot commence ici...</span>';return}
   $('wtiles').innerHTML=word.split('').map((l,i)=>{
     const isNew=i===word.length-1;
     return`<div class="tile${isNew?' new':''}">${l}</div>`;
@@ -594,19 +552,36 @@ function doJoin(){
   socket.emit('joinRoom',{name,code:code||null});
 }
 function qjoin(code){$('iCode').value=code;doJoin()}
-
 $('btnJoin').onclick=doJoin;
 $('btnCreate').onclick=doJoin;
 $('iName').onkeydown=e=>{if(e.key==='Enter')doJoin()};
 $('iCode').onkeydown=e=>{if(e.key==='Enter')doJoin()};
 $('iCode').oninput=e=>{e.target.value=e.target.value.toUpperCase()};
-$('btnCopy').onclick=()=>{navigator.clipboard.writeText(myRoom);$('btnCopy').textContent='✅ Copié !'};
+$('btnCopy').onclick=()=>{navigator.clipboard.writeText(myRoom);$('btnCopy').textContent='\u2705 Copi\u00e9 !'};
 $('btnLeave').onclick=()=>{socket.emit('leaveRoom');myRoom=null;screen('screenLobby')};
 $('btnStart').onclick=()=>socket.emit('startGame');
+
 $('btnPlay').onclick=play;
 $('letterInput').onkeydown=e=>{if(e.key==='Enter')play()};
-$('letterInput').oninput=e=>{e.target.value=e.target.value.replace(/[^a-zA-ZàâäéèêëîïôùûüÿçæœÀÂÄÉÈÊËÎÏÔÙÛÜŸÇÆŒ]/g,'').toUpperCase()};
-function play(){const v=$('letterInput').value.trim().toUpperCase();if(!v)return;socket.emit('playLetter',{letter:v});$('letterInput').value='';$('letterInput').focus()}
+$('letterInput').oninput=e=>{e.target.value=e.target.value.replace(/[^a-zA-Z\u00e0\u00e2\u00e4\u00e9\u00e8\u00ea\u00eb\u00ee\u00ef\u00f4\u00f9\u00fb\u00fc\u00ff\u00e7\u00e6\u0153\u00c0\u00c2\u00c4\u00c9\u00c8\u00ca\u00cb\u00ce\u00cf\u00d4\u00d9\u00db\u00dc\u0178\u00c7\u00c6\u0152]/g,'').toUpperCase()};
+
+function play(){
+  const v=$('letterInput').value.trim().toUpperCase();
+  if(!v)return;
+  socket.emit('playLetter',{letter:v});
+  $('letterInput').value='';$('letterInput').focus();
+}
+
+// Terminer volontairement
+$('btnFinish').onclick=()=>{
+  const v=$('letterInput').value.trim().toUpperCase();
+  if(!v){alert('Entre d\u2019abord ta lettre !');$('letterInput').focus();return}
+  if(confirm(`Terminer le mot avec "${v}" ? Tu perdras 0 point mais les autres gagneront ${(gs?.word?.length||0)+1} points.`)){
+    socket.emit('finishWord',{letter:v});
+    $('letterInput').value='';
+  }
+};
+
 $('btnChallenge').onclick=()=>socket.emit('challenge');
 $('btnRestart').onclick=()=>socket.emit('restartGame');
 $('btnLobby').onclick=()=>{socket.emit('leaveRoom');myRoom=null;$('ovG').classList.remove('show');screen('screenLobby')};

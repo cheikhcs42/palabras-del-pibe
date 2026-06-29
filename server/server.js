@@ -1,8 +1,9 @@
 const express = require('express');
 const http    = require('http');
+const https   = require('https');
 const { Server } = require('socket.io');
 const path    = require('path');
-const https   = require('https');
+const fs      = require('fs');
 
 const app    = express();
 const server = http.createServer(app);
@@ -10,10 +11,57 @@ const io     = new Server(server);
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ── DICTIONNAIRE FRANÇAIS FIABLE ─────────────────────────────────────────────
-// On utilise l'API du CNRTL (Centre National de Ressources Textuelles et Lexicales)
-// + fallback sur une liste locale très large
-const wordCache = new Map();
+// ── DICTIONNAIRE FRANÇAIS COMPLET ─────────────────────────────────────────────
+let DICT_FR = new Set();
+
+function norm(w) { return w.toLowerCase().normalize('NFC').trim(); }
+
+function loadDict() {
+  const p = path.join(__dirname, 'french_words.txt');
+  if (fs.existsSync(p)) {
+    const lines = fs.readFileSync(p, 'utf8').split('\n');
+    DICT_FR = new Set(lines.map(norm).filter(l => l.length >= 2));
+    console.log(`📚 Dictionnaire : ${DICT_FR.size} mots`);
+  } else {
+    console.log('📥 Téléchargement dictionnaire...');
+    const file = fs.createWriteStream(p);
+    https.get('https://raw.githubusercontent.com/hbenbel/French-Dictionary/master/dictionary/dictionary.txt', res => {
+      res.pipe(file);
+      file.on('finish', () => {
+        file.close();
+        const lines = fs.readFileSync(p, 'utf8').split('\n');
+        DICT_FR = new Set(lines.map(norm).filter(l => l.length >= 2));
+        console.log(`📚 Dictionnaire téléchargé : ${DICT_FR.size} mots`);
+      });
+    }).on('error', () => { fs.unlink(p, ()=>{}); DICT_FR = FALLBACK; console.log('⚠ Fallback dict'); });
+  }
+}
+
+// Liste de secours si le téléchargement échoue
+const FALLBACK = new Set([
+  'maison','voiture','jardin','table','chaise','porte','fenetre','route','fleur','arbre',
+  'soleil','nuage','pluie','neige','terre','pierre','riviere','montagne','foret','ocean',
+  'cheval','chien','chat','oiseau','poisson','lapin','tigre','lion','elephant','girafe',
+  'marge','image','plage','stage','usage','dogmatique','systematique','automatique',
+  'probleme','exemple','nombre','lettre','phrase','texte','roman','poeme','chanson',
+  'grand','petit','gros','mince','beau','vieux','jeune','fort','faible','rapide',
+  'rouge','bleu','vert','blanc','noir','jaune','violet','rose','gris','beige',
+  'lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche',
+  'monde','pays','ville','village','quartier','place','pont','chemin',
+  'musique','peinture','theatre','cinema','danse','opera','ballet',
+  'piano','guitare','violon','trompette','tambour','flute','harpe',
+  'pizza','sushi','burger','gateau','tarte','crepe','mousse','brioche',
+  'football','tennis','basket','natation','cyclisme','rugby','volleyball',
+  'ballon','stade','arbitre','gardien','attaque','defense','carton','trophee',
+  'amour','amitie','bonheur','tristesse','joie','colere','peur','espoir',
+  'medecin','hopital','pharmacie','maladie','sante','chirurgie','traitement',
+  'ecole','classe','eleve','professeur','lycee','universite','diplome',
+  'telephone','ordinateur','television','internet','clavier','souris','ecran',
+  'argent','banque','travail','bureau','magasin','commerce','marche',
+  'maradona','messi','ronaldo','neymar','mbappe',
+]);
+
+loadDict();
 
 function looksLikeVerb(word) {
   const w = word.toLowerCase();
@@ -22,180 +70,13 @@ function looksLikeVerb(word) {
   return false;
 }
 
-// Vérification via l'API Wiktionary (beaucoup plus complète pour le français)
-async function checkViaWiktionary(word) {
-  return new Promise((resolve) => {
-    const w = encodeURIComponent(word.toLowerCase());
-    const req = https.get(
-      `https://fr.wiktionary.org/api/rest_v1/page/definition/${w}`,
-      { timeout: 5000 },
-      (res) => {
-        let data = '';
-        res.on('data', c => data += c);
-        res.on('end', () => {
-          if (res.statusCode === 200) {
-            try {
-              const json = JSON.parse(data);
-              // Vérifier que c'est bien un mot français (clé 'fr' présente)
-              const hasFr = json.fr && json.fr.length > 0;
-              resolve(hasFr);
-            } catch { resolve(false); }
-          } else {
-            resolve(false);
-          }
-        });
-      }
-    );
-    req.on('error', () => resolve(null)); // null = erreur réseau
-    req.on('timeout', () => { req.destroy(); resolve(null); });
-  });
-}
-
-async function checkWord(word) {
-  const w = word.toLowerCase().trim();
+function checkWord(word) {
+  const w = norm(word);
   if (w.length < 5) return { valid: false, reason: 'trop_court' };
   if (looksLikeVerb(w)) return { valid: false, reason: 'verbe' };
-  if (wordCache.has(w)) return wordCache.get(w);
-
-  // 1. Vérifier d'abord dans la liste locale (rapide)
-  if (DICT_FR.has(w)) {
-    const r = { valid: true, reason: 'ok' };
-    wordCache.set(w, r);
-    return r;
-  }
-
-  // 2. Wiktionary pour les mots hors liste
-  const wikt = await checkViaWiktionary(w);
-  if (wikt === true) {
-    const r = { valid: true, reason: 'ok' };
-    wordCache.set(w, r);
-    return r;
-  }
-  if (wikt === false) {
-    const r = { valid: false, reason: 'inconnu' };
-    wordCache.set(w, r);
-    return r;
-  }
-  // wikt === null (erreur réseau) → on dit valide pour ne pas pénaliser injustement
-  return { valid: true, reason: 'ok_fallback' };
+  const valid = DICT_FR.has(w);
+  return { valid, reason: valid ? 'ok' : 'inconnu' };
 }
-
-// Dictionnaire local français étendu — noms communs et adjectifs uniquement
-const DICT_FR = new Set([
-  // Corps & médecine
-  'corps','tete','bras','jambe','ventre','coeur','cerveau','poumon','foie','reins',
-  'genou','epaule','poignet','cheville','talon','orteil','menton','tempe','nuque',
-  'thorax','bassin','colonne','sternum','clavicule','tibia','fibula','radius',
-  'medecin','docteur','infirmier','pharmacie','maladie','sante','hopital','clinique',
-  'chirurgie','medecine','guerison','symptome','traitement','medicament','vaccin',
-  'fracture','blessure','infection','fievre','grippe','allergie','douleur','plaie',
-  // Famille
-  'famille','parent','enfant','frere','soeur','cousin','cousine','oncle','tante',
-  'neveu','niece','grand','aieul','ancetre','epoux','epouse','conjoint','fiancee',
-  'jumeau','jumelle','parrain','marraine','fillleul','belle','gendre','beau',
-  // Nature
-  'nature','arbre','foret','montagne','riviere','fleuve','ocean','desert','savane',
-  'jungle','prairie','marais','volcan','glacier','falaise','plage','dune','vallee',
-  'colline','plateau','grotte','cascade','torrent','etang','lagune','delta','recif',
-  'soleil','lune','etoile','nuage','pluie','neige','grele','brume','brouillard',
-  'orage','tempete','cyclone','tsunami','seisme','eruption','avalanche','inondation',
-  'aurore','crepuscule','zenith','horizon','atmosphere','troposphere','stratosphere',
-  // Animaux
-  'cheval','chien','chat','oiseau','poisson','lapin','tigre','lion','elephant','girafe',
-  'jaguar','puma','guepard','leopard','ocelot','lynx','panthère','hyène','chacal',
-  'requin','dauphin','baleine','pieuvre','meduse','corail','crevette','homard','moule',
-  'aigle','faucon','hibou','chouette','perroquet','flamant','pelican','cigogne','grue',
-  'serpent','crocodile','lezard','tortue','grenouille','crapaud','salamandre','vipere',
-  // Végétaux
-  'cactus','bambou','palmier','sapin','chene','erable','bouleau','tilleul','frene',
-  'tulipe','orchidee','jasmin','lavande','pivoine','dahlia','coquelicot','marguerite',
-  'rosier','lierre','fougere','mousse','algue','champignon','truffe','cèdre','sequoia',
-  // Alimentation
-  'maison','voiture','jardin','table','chaise','porte','fenetre','route','fleur',
-  'pain','beurre','fromage','pomme','poire','orange','banane','raisin','tomate','salade',
-  'pizza','sushi','burger','tacos','crepe','gateau','tarte','souffle','mousse','brioche',
-  'croissant','baguette','macaron','eclair','madeleine','quiche','ratatouille','bouillabaisse',
-  'saumon','thon','cabillaud','sardine','anchois','truite','carpe','brochet',
-  'poulet','canard','dindon','lapin','agneau','veau','porc','boeuf','cerf','sanglier',
-  'carotte','poireau','navet','radis','betterave','courgette','aubergine','poivron',
-  'artichaut','asperge','brocoli','choufleur','epinard','endive','cresson','fenouil',
-  'fraise','framboise','cerise','abricot','peche','prune','melon','pastèque','mangue',
-  'ananas','kiwi','litchi','grenade','figue','datte','noix','noisette','amande','pistache',
-  // Couleurs / adjectifs courants
-  'rouge','bleu','vert','blanc','noir','jaune','violet','rose','gris','beige','turquoise',
-  'ecarlate','cramoisi','carmin','vermeil','azur','indigo','emeraude','ocre','ivoire',
-  'grand','petit','gros','mince','beau','laid','vieux','jeune','fort','faible','rapide',
-  'lent','doux','dur','chaud','froid','humide','sec','lourd','leger','etroit','large',
-  'profond','superficiel','ancien','moderne','simple','complexe','riche','pauvre',
-  // Temps / calendrier
-  'lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche',
-  'janvier','fevrier','mars','avril','juin','juillet','aout','septembre','octobre','novembre','decembre',
-  'heure','minute','seconde','matin','soir','nuit','midi','minuit','aurore','crepuscule',
-  'printemps','automne','hiver','saison','annee','decennie','siecle','millenaire','epoque',
-  // Lieux & ville
-  'ville','village','quartier','banlieue','metropole','capitale','province','region',
-  'place','avenue','boulevard','impasse','ruelle','chemin','sentier','autoroute',
-  'mairie','eglise','cathedrale','mosquee','synagogue','temple','abbaye','monastere',
-  'palais','chateau','donjon','forteresse','manoir','chalet','pavillon','immeuble',
-  'gare','aeroport','port','marina','quai','jetee','embarcadere','passerelle','tunnel',
-  'marche','supermarche','boutique','magasin','pharmacie','librairie','boulangerie',
-  'boucherie','poissonnerie','fromagerie','patisserie','charcuterie','epicerie',
-  'cinema','theatre','musee','galerie','bibliotheque','stade','gymnase','piscine',
-  // Transport
-  'voiture','camion','moto','velo','scooter','trottinette','autobus','tramway',
-  'metro','train','avion','helicoptere','bateau','yacht','ferry','sous-marin',
-  'fusee','navette','satellite','station','vaisseau','dirigeable','montgolfiere',
-  // Maison / objet
-  'cuisine','chambre','salon','salle','couloir','cave','grenier','garage','balcon',
-  'fenetre','porte','escalier','ascenseur','toit','mur','sol','plafond','terrasse',
-  'table','chaise','canape','fauteuil','bureau','armoire','commode','etagere','buffet',
-  'miroir','tableau','rideau','tapis','coussin','couette','oreiller','drap','serviette',
-  'telephone','ordinateur','ecran','clavier','souris','imprimante','television',
-  'radio','enceinte','camera','telescope','microscope','thermometre','barometre',
-  // Sport
-  'football','tennis','basket','natation','cyclisme','rugby','volleyball','boxe',
-  'judo','karate','aikido','escrime','tir','plongeon','aviron','kayak','surf',
-  'athletisme','marathon','sprint','saut','lancer','disque','marteau','javelot',
-  'equitation','polo','golf','cricket','baseball','hockey','patinage','luge','bobsleigh',
-  'alpinisme','escalade','parachutisme','deltaplane','planche','snowboard','slalom',
-  'ballon','terrain','arbitre','gardien','attaque','defense','carton','penalty',
-  'stade','podium','medaille','trophee','champion','victoire','defaite','match',
-  // Art & culture
-  'musique','peinture','sculpture','dessin','gravure','photographie','cinema',
-  'theatre','danse','opera','ballet','cirque','magie','poesie','roman','nouvelle',
-  'conte','fable','legende','mythe','saga','epopee','chronique','reportage',
-  'guitare','piano','violon','trompette','tambour','flute','harpe','orgue','accordeon',
-  'symphonie','sonate','concerto','opera','cantate','fugue','valse','tango','reggae',
-  // Matières & matériaux
-  'pierre','marbre','granit','ardoise','calcaire','gres','basalte','obsidienne',
-  'bois','chene','acajou','bambou','liege','balsa','erable','noyer','cerisier',
-  'metal','acier','bronze','cuivre','argent','platine','titane','aluminium',
-  'verre','cristal','plastique','caoutchouc','nylon','kevlar','carbone','silicone',
-  'tissu','coton','soie','laine','lin','chanvre','velours','dentelle','satin',
-  // Sciences & nature
-  'physique','chimie','biologie','geologie','astronomie','mathematique','informatique',
-  'atome','molecule','electron','proton','neutron','photon','quark','lepton',
-  'planete','comete','asteroid','nebuleuse','galaxie','univers','cosmos','espace',
-  'acide','base','oxyde','metal','cristal','polymere','enzyme','hormone','proteine',
-  // Noms propres devenus noms communs ou très connus
-  'maradona','messi','ronaldo','neymar','mbappe',
-  // Mots courants souvent challengés
-  'marge','image','plage','stage','usage','cage','page','rage','sage','nage',
-  'rouge','bouge','louge','joue','douce','mousse','rousse','pousse','tousse',
-  'large','farge','charge','marge','varge',
-  'belle','selle','celle','telle','quelle','uelle','pelle','gelle','nelle',
-  'force','torce','berce','perce','merce','terce',
-  'monde','ronde','blonde','fronde','seconde','profonde','feconde',
-  'place','grace','trace','efface','glace','brace','espace',
-  'chose','prose','rose','dose','pose','nose','expose','impose','compose',
-  'prise','crise','brise','frise','grise','cerise','surprise','entreprise',
-  'table','cable','sable','fable','gable','stable','rentable','notable','portable',
-  'carte','parte','marte','tarte','farte','smarte','charte','quarte',
-  'porte','forte','morte','sorte','torte','norte','escorte','exhorte',
-  'ville','fille','bille','gille','mille','nille','sille','grille','brille','trille',
-  'livre','litre','titre','pitre','vitre','mitre','nitre','etre','etre',
-  'arbre','marbre','entre','centre','ventre','contre','montre','nombre','ombre',
-]);
 
 // ── ROOMS ─────────────────────────────────────────────────────────────────────
 const rooms = new Map();
@@ -308,7 +189,33 @@ io.on('connection', (socket) => {
     startTimer(room);
   });
 
-  socket.on('challenge', async () => {
+  // ── TERMINER VOLONTAIREMENT ──
+  socket.on('finishWord', ({ letter }) => {
+    const room = rooms.get(socket.data.room);
+    if (!room || room.status !== 'playing' || room.challenged) return;
+    const cur = room.players[room.currentPlayerIndex];
+    if (!cur || cur.id !== socket.id) return socket.emit('error', { message: "Pas ton tour !" });
+    if (!letter || !/^[A-Za-z\u00c0-\u024f]/i.test(letter)) return socket.emit('error', { message: 'Lettre invalide.' });
+    clearTimer(room);
+    const l = letter.toUpperCase();
+    room.word += l;
+    room.wordHistory.push({ letter: l, playerId: socket.id, playerName: cur.name });
+    io.to(room.code).emit('letterPlayed', { playerName: cur.name, letter: l, word: room.word });
+    // Le joueur perd volontairement — le mot s'arrete ici
+    const reason = `${cur.name} a choisi de terminer le mot sur "${room.word}" (${room.word.length} lettres).`;
+    io.to(room.code).emit('voluntaryFinish', { playerName: cur.name, word: room.word });
+    setTimeout(() => {
+      const scores = room.players.map(p => ({ id: p.id, name: p.name, score: room.scores[p.id]||0 }));
+      // Donner les points avant endRound
+      room.players.forEach(p => { if (p.id !== socket.id) room.scores[p.id] = (room.scores[p.id]||0) + room.word.length; });
+      room.status = 'roundEnd';
+      clearTimer(room);
+      const scoresSorted = room.players.map(p => ({ id: p.id, name: p.name, score: room.scores[p.id]||0 })).sort((a,b) => b.score-a.score);
+      io.to(room.code).emit('roundEnded', { loser: { id: socket.id, name: cur.name }, word: room.word, reason, scores: scoresSorted, round: room.round, totalRounds: room.totalRounds, voluntary: true });
+    }, 800);
+  });
+
+  socket.on('challenge', () => {
     const room = rooms.get(socket.data.room);
     if (!room || room.status !== 'playing' || room.challenged) return;
     if (!room.wordHistory.length) return socket.emit('error', { message: 'Rien à challenger.' });
@@ -319,7 +226,11 @@ io.on('connection', (socket) => {
     const challenger = room.players.find(p => p.id === socket.id);
     const challenged = room.players.find(p => p.id === lastPlay.playerId);
     io.to(room.code).emit('challengeStarted', { challengerName: challenger?.name, challengedName: challenged?.name, word: room.word });
-    const result = await checkWord(room.word);
+
+    // Synchrone maintenant — plus besoin d'async !
+    const result = checkWord(room.word);
+    console.log(`[${room.code}] Challenge "${room.word}" → valid:${result.valid} reason:${result.reason}`);
+
     let loserId, reason;
     if (result.reason === 'verbe') {
       loserId = lastPlay.playerId;
