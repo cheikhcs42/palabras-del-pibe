@@ -370,6 +370,33 @@ input::placeholder{color:var(--mist)}
   </div>
 </div>
 
+
+<!-- VERDICT HOTE -->
+<div class="cov" id="verdictOv" style="z-index:300">
+  <div class="covc" style="max-width:380px">
+    <div class="cico">&#9878;</div>
+    <div class="ctit" id="verdictTit">Challenge !</div>
+    <div class="csub" id="verdictSub"></div>
+    <div class="cword" id="verdictWord"></div>
+    <div id="verdictBtns" style="display:flex;gap:10px;justify-content:center;margin-top:.5rem">
+      <button class="btn btn-gold" id="btnValid" style="flex:1;font-size:16px">&#10003; Mot valide</button>
+      <button class="btn btn-red" id="btnInvalid" style="flex:1;font-size:16px">&#10007; Mot invalide</button>
+    </div>
+    <div style="margin-top:.75rem">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:11px;color:var(--mist);text-transform:uppercase;letter-spacing:.1em" id="verdictTimerLabel">Décision de l'hôte</span>
+        <span style="font-family:'Courier Prime',monospace;font-size:20px;font-weight:700;color:var(--gold)" id="verdictTimerNum">30</span>
+      </div>
+      <div style="height:4px;background:var(--rim);border-radius:2px;overflow:hidden">
+        <div id="verdictTimerBar" style="height:100%;background:var(--gold);border-radius:2px;transition:width 1s linear,background .3s;width:100%"></div>
+      </div>
+    </div>
+    <div id="verdictWait" style="display:none;font-size:13px;color:var(--mist);margin-top:.5rem;text-align:center">
+      En attente de la décision de l'hôte<span class="dots"></span>
+    </div>
+  </div>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
 const AVC=['#3B7DD8','#1D9E75','#C85D30','#9B59B6','#D4AC0D'];
@@ -425,6 +452,51 @@ socket.on('letterPlayed',({playerName,letter,word})=>{
 socket.on('timerTick',({timeLeft,max})=>timerUI(timeLeft,max));
 socket.on('timerOut',({playerName})=>log(`\u23f1 ${playerName} n'a pas jou\u00e9 \u00e0 temps !`,'ev'));
 
+socket.on('challengePending',({challengerName,challengedName,word,hostId})=>{
+  const isHost=myId===hostId;
+  $('verdictTit').textContent='Challenge !';
+  $('verdictSub').innerHTML='<strong>'+challengerName+'</strong> pense qu\'aucun mot n\'est possible avec <strong>'+word+'</strong>';
+  $('verdictWord').textContent=word;
+  if(isHost){
+    $('btnValid').textContent='✓ Un mot existe';
+    $('btnInvalid').textContent='✗ Aucun mot possible';
+  }
+  $('verdictBtns').style.display=isHost?'flex':'none';
+  $('verdictWait').style.display=isHost?'none':'block';
+  $('verdictOv').classList.add('show');
+  log('⚡ '+challengerName+' pense qu\'aucun mot n\'est possible avec "'+word+'"','wn');
+});
+$('btnValid').onclick=()=>socket.emit('hostVerdict',{valid:true});
+$('btnInvalid').onclick=()=>socket.emit('hostVerdict',{valid:false});
+
+socket.on('hostTimerTick',({timeLeft,max})=>{
+  $('verdictTimerNum').textContent=timeLeft;
+  $('verdictTimerBar').style.width=`${(timeLeft/max)*100}%`;
+  const cls=timeLeft<=5?'var(--red)':timeLeft<=10?'var(--warn)':'var(--gold)';
+  $('verdictTimerBar').style.background=cls;
+  $('verdictTimerNum').style.color=cls;
+});
+
+socket.on('wordCheckPending',({word,loserName,hostId})=>{
+  const isHost=myId===hostId;
+  $('verdictTit').textContent='Ce mot existe ?';
+  $('verdictSub').innerHTML='<strong>'+loserName+'</strong> a formé le mot — est-ce un mot français valide ?';
+  $('verdictWord').textContent=word;
+  if(isHost){
+    $('btnValid').textContent='✓ Mot valide';
+    $('btnInvalid').textContent='✗ Mot invalide';
+  }
+  $('verdictBtns').style.display=isHost?'flex':'none';
+  $('verdictWait').style.display=isHost?'none':'block';
+  $('verdictOv').classList.add('show');
+  log('❓ "'+word+'" — l\'hôte vérifie...','wn');
+});
+
+socket.on('wordCheckResult',({word,valid,reason})=>{
+  $('verdictOv').classList.remove('show');
+  log(reason, valid?'ev':'ok');
+});
+
 socket.on('challengeStarted',({challengerName,challengedName,word})=>{
   $('cico').textContent='\u26a1';$('ctit').textContent='Challenge !';
   $('csub').textContent=`${challengerName} challenge ${challengedName}`;
@@ -433,6 +505,7 @@ socket.on('challengeStarted',({challengerName,challengedName,word})=>{
   log(`\u26a1 ${challengerName} challenge "${word}"`, 'wn');
 });
 socket.on('challengeResult',({word,valid,reason,loserName})=>{
+  $('verdictOv').classList.remove('show');
   $('cico').textContent=valid?'\u2705':'\u274c';
   $('ctit').textContent=valid?'Mot valide !':'Mot invalide !';
   $('cres').textContent=reason;$('cres').className='cres '+(valid?'good':'bad');
@@ -441,6 +514,7 @@ socket.on('challengeResult',({word,valid,reason,loserName})=>{
 });
 
 socket.on('roundEnded',({loser,word,reason,scores,round,totalRounds,voluntary})=>{
+  $('verdictOv').classList.remove('show');
   timerUI(0);
   $('oRico').textContent=voluntary?'\ud83d\udd1a':'\ud83d\ude2c';
   $('oRtit').textContent=loser.name+(voluntary?' termine volontairement !':" perd la manche !");
@@ -512,8 +586,10 @@ function renderGame(state){
 
   // Boutons : disponibles seulement si mot >= 5 lettres (pour Terminer) ou >= 2 lettres (Challenge)
   const last=state.wordHistory&&state.wordHistory.length>0?state.wordHistory[state.wordHistory.length-1].playerId:null;
-  const canChallenge=!!(state.word&&state.word.length>=2&&last&&last!==myId);
-  const canFinish=isMe&&state.word&&state.word.length>=4; // 4+ lettres car on va en ajouter une
+  // Challenge : dispo si mot >= 2 lettres et pas moi le dernier
+  const canChallenge=isMe&&!!(state.word&&state.word.length>=2&&last&&last!==myId);
+  // Terminer : dispo pour TOUT joueur dont c'est le tour, mot >= 4 lettres
+  const canFinish=isMe&&state.word&&state.word.length>=4;
 
   $('btnChallenge').disabled=!canChallenge;
   $('btnFinish').disabled=!canFinish;
