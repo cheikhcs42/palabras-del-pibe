@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Las Palabras del Pibe de Oro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Inter:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --night:    #0a0e1a;
+  --pitch:    #0f1525;
+  --panel:    #161d30;
+  --card:     #1e2740;
+  --rim:      #283352;
+  --gold:     #ffd700;
+  --gold-dim: #b89a00;
+  --silver:   #c8d4e8;
+  --mist:     #7a8eaa;
+  --danger:   #e74c3c;
+  --safe:     #27ae60;
+  --font-display: 'Oswald', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'Courier Prime', monospace;
+  --radius: 8px;
+  --transition: .2s ease;
+}
+html, body { height: 100%; }
+body {
+  font-family: var(--font-body);
+  background: var(--night);
+  color: var(--silver);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--night); }
+::-webkit-scrollbar-thumb { background: var(--rim); border-radius: 2px; }
+
+/* ── HERO HEADER ── */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 220px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  background: linear-gradient(135deg, #0a0e1a 0%, #111827 100%);
+  border-bottom: 1px solid var(--rim);
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 30% 50%, rgba(255,215,0,.08) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 80% 30%, rgba(30,60,120,.25) 0%, transparent 70%);
+}
+.hero-pitch-lines {
+  position: absolute; inset: 0;
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0, transparent 38px, rgba(255,255,255,.025) 38px, rgba(255,255,255,.025) 40px);
+}
+.hero-img {
+  position: absolute;
+  right: 0; bottom: 0;
+  height: 210px;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom right;
+  opacity: .92;
+  filter: contrast(1.05) brightness(.95);
+  mask-image: linear-gradient(to left, rgba(0,0,0,.9) 30%, transparent 90%),
+              linear-gradient(to top,  rgba(0,0,0,1) 0%, rgba(0,0,0,.4) 100%);
+  -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,.9) 30%, transparent 90%);
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 2rem 2rem 1.5rem;
+  max-width: 600px;
+}
+.hero-eyebrow {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: .5rem;
+}
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.05;
+  color: #fff;
+  letter-spacing: .02em;
+}
+.hero-title .accent { color: var(--gold); }
+.hero-sub {
+  font-size: 13px;
+  color: var(--mist);
+  margin-top: .6rem;
+  line-height: 1.5;
+}
+
+/* ── LAYOUT ── */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 220px);
+}
+.main {
+  flex: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 1.5rem 1rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── SCREENS ── */
+.screen { display: none; flex-direction: column; gap: 1.25rem; }
+.screen.active { display: flex; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--rim);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+}
+.card-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--mist);
+  margin-bottom: 1rem;
+}
+.card-title .highlight { color: var(--gold); }
+
+/* ── INPUTS & BUTTONS ── */
+input[type="text"] {
+  background: var(--pitch);
+  border: 1px solid var(--rim);
+  border-radius: var(--radius);
+  color: var(--silver);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--transition);
+}
+input[type="text"]:focus { border-color: var(--gold); }
+input[type="text"]::placeholder { color: var(--mist); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--rim);
+  background: transparent;
+  color: var(--silver);
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.btn:hover { background: var(--panel); border-color: var(--silver); }
+.btn:active { transform: scale(.97); }
+.btn:disabled { opacity: .4; cursor: default; pointer-events: none; }
+.btn-gold {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #000;
+}
+.btn-gold:hover { background: #ffe84d; border-color: #ffe84d; }
+.btn-danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+.btn-danger:hover { background: rgba(231,76,60,.1); }
+.btn-sm { font-size: 12px; padding: 6px 12px; }
+
+/* ── LOBBY ── */
+.lobby-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+@media(max-width:600px) { .lobby-grid { grid-template-columns: 1fr; } }
+
+.join-form { display: flex; flex-direction: column; gap: .75rem; }
+.join-form label { font-size: 12px; color: var(--mist); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 2px; display: block; }
+.join-row { display: flex; gap: 8px; }
+.join-row input { flex: 1; }
+
+.rooms-list { display: flex; flex-direction: column; gap: 8px; }
+.room-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--panel);
+  border: 1px solid var(--rim);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+.room-item:hover { border-color: var(--gold); }
+.room-icon {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(255,215,0,.1);
+  border: 1px solid rgba(255,215,0,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.room-name { font-weight: 600; font-size: 14px; color: #fff; }
+.room-count { font-size: 12px; color: var(--mist); }
+.room-join-btn { margin-left: auto; }
+.rooms-empty { text-align: center; padding: 2rem; color: var(--mist); font-size: 13px; }
+
+/* ── SALON (WAITING ROOM) ── */
+.salon-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; margin-bottom: 1rem; }
+.salon-code {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: .3em;
+  background: var(--pitch);
+  border: 1px solid rgba(255,215,0,.3);
+  border-radius: var(--radius);
+  padding: 8px 20px;
+}
+.players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.player-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 10px;
+  background: var(--panel);
+  border: 1px solid var(--rim);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.player-slot.me { border-color: var(--gold); }
+.player-slot.empty { opacity: .4; border-style: dashed; }
+.player-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+}
+.player-slot.empty .player-avatar { background: var(--rim) !important; color: var(--mist); font-size: 18px; }
+.player-pname { font-size: 13px; font-weight: 600; color: var(--silver); }
+.player-badge { font-size: 11px; color: var(--gold); }
+.player-slot.empty .player-pname { color: var(--mist); font-style: italic; }
+
+/* ── GAME SCREEN ── */
+.game-layout { display: grid; grid-template-columns: 1fr 260px; gap: 1.25rem; }
+@media(max-width:680px) { .game-layout { grid-template-columns: 1fr; } }
+
+/* Turn indicator */
+.turn-banner {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--rim);
+  font-size: 14px;
+}
+.turn-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--mist);
+  flex-shrink: 0;
+}
+.turn-banner.my-turn { border-color: var(--gold); }
+.turn-banner.my-turn .turn-dot { background: var(--gold); box-shadow: 0 0 8px var(--gold); animation: pulse 1.2s ease infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.turn-name { font-weight: 600; color: #fff; }
+.turn-label { color: var(--mist); font-size: 12px; margin-left: auto; }
+
+/* Word display */
+.word-card {
+  background: var(--pitch);
+  border: 1px solid var(--rim);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+}
+.word-letters {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 72px;
+}
+.letter-tile {
+  width: 52px; height: 60px;
+  background: var(--card);
+  border: 1px solid var(--rim);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 700;
+  color: #fff;
+  position: relative;
+  animation: dropIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+.letter-tile.new { border-color: var(--gold); color: var(--gold); }
+@keyframes dropIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.letter-tile.danger { border-color: var(--danger); color: var(--danger); }
+.word-empty { color: var(--mist); font-size: 15px; font-style: italic; }
+.word-meta { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 1rem; font-size: 13px; color: var(--mist); }
+.word-len { font-family: var(--font-mono); font-size: 22px; font-weight: 700; color: var(--silver); }
+.warn-badge {
+  background: rgba(231,76,60,.15);
+  border: 1px solid rgba(231,76,60,.3);
+  color: var(--danger);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.safe-badge {
+  background: rgba(39,174,96,.1);
+  border: 1px solid rgba(39,174,96,.2);
+  color: var(--safe);
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* Action input */
+.action-card { display: flex; flex-direction: column; gap: .75rem; }
+.big-letter-input {
+  display: flex; gap: 10px; align-items: stretch;
+}
+.big-letter-input input {
+  width: 80px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 8px;
+}
+.big-letter-input .btn-gold { flex: 1; font-size: 15px; }
+.waiting-msg { text-align: center; padding: 1rem; color: var(--mist); font-size: 13px; }
+.waiting-dots::after { content: '...'; animation: dots 1.2s step-start infinite; }
+@keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+
+/* Scoreboard sidebar */
+.score-panel { display: flex; flex-direction: column; gap: 8px; }
+.score-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--rim);
+  transition: border-color var(--transition);
+}
+.score-row.active { border-color: var(--gold); background: rgba(255,215,0,.05); }
+.score-row.loser { border-color: var(--danger); background: rgba(231,76,60,.05); }
+.score-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #000; flex-shrink: 0; }
+.score-name { font-size: 13px; font-weight: 600; color: var(--silver); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.score-pts { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--gold); }
+.score-row.active .score-name { color: #fff; }
+
+/* Round info */
+.round-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--mist);
+  padding: 4px 10px;
+  border: 1px solid var(--rim);
+  border-radius: 20px;
+}
+.round-badge .num { color: var(--gold); font-size: 14px; }
+
+/* Log */
+.log-area { display: flex; flex-direction: column; gap: 4px; max-height: 160px; overflow-y: auto; }
+.log-line { font-size: 12px; color: var(--mist); padding: 3px 0; border-bottom: 1px solid rgba(255,255,255,.04); }
+.log-line .actor { color: var(--silver); font-weight: 600; }
+.log-line.event { color: var(--danger); }
+.log-line.good { color: var(--safe); }
+
+/* ── ROUND END / GAME END ── */
+.result-card { text-align: center; }
+.result-icon { font-size: 52px; margin-bottom: .75rem; }
+.result-title { font-family: var(--font-display); font-size: 26px; font-weight: 700; text-transform: uppercase; color: #fff; margin-bottom: .5rem; }
+.result-sub { font-size: 14px; color: var(--mist); margin-bottom: 1.5rem; }
+.result-word {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  border: 1px solid rgba(255,215,0,.3);
+  border-radius: var(--radius);
+  padding: 4px 16px;
+  margin-bottom: 1.5rem;
+}
+.podium { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; text-align: left; }
+.podium-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 1px solid var(--rim);
+}
+.podium-row.first { border-color: var(--gold); background: rgba(255,215,0,.06); }
+.podium-row.loser { border-color: var(--danger); background: rgba(231,76,60,.06); }
+.podium-rank { width: 24px; font-size: 13px; color: var(--mist); flex-shrink: 0; }
+.podium-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--silver); }
+.podium-row.first .podium-name { color: #fff; }
+.podium-pts { font-family: var(--font-mono); font-size: 18px; font-weight: 700; color: var(--gold); }
+.delta { font-size: 12px; margin-left: 6px; }
+.delta.plus { color: var(--safe); }
+.delta.zero { color: var(--danger); }
+.btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--card); border: 1px solid var(--rim);
+  color: var(--silver); font-size: 13px;
+  padding: 10px 20px; border-radius: 20px;
+  opacity: 0; pointer-events: none;
+  transition: all .3s ease;
+  z-index: 999;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── RULES ── */
+.rules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 10px; }
+.rule-item { display: flex; align-items: flex-start; gap: 10px; }
+.rule-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(255,215,0,.1); border: 1px solid rgba(255,215,0,.3);
+  color: var(--gold); font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.rule-text { font-size: 12px; color: var(--mist); line-height: 1.5; }
+
+/* ── CONNECTION STATUS ── */
+.conn-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--danger); margin-right: 6px;
+  transition: background var(--transition);
+}
+.conn-dot.connected { background: var(--safe); }
+
+/* ── AVATAR COLORS ── */
+.av-0  { background: #ffd700; }
+.av-1  { background: #1D9E75; }
+.av-2  { background: #D85A30; }
+.av-3  { background: #7F77DD; }
+.av-4  { background: #D4537E; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-pitch-lines"></div>
+  <img
+    class="hero-img"
+    src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Maradona-Mundial_86_con_la_copa.JPG/800px-Maradona-Mundial_86_con_la_copa.JPG"
+    alt="Diego Maradona avec la Coupe du Monde 1986"
+    onerror="this.style.display='none'"
+  />
+  <div class="hero-content">
+    <div class="hero-eyebrow">⚽ Jeu de lettres en ligne · 5 joueurs</div>
+    <h1 class="hero-title">Las Palabras<br/>del <span class="accent">Pibe de Oro</span></h1>
+    <div class="hero-sub">
+      <span class="conn-dot" id="connDot"></span>
+      <span id="connLabel">Connexion au serveur...</span>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app">
+<div class="main">
+
+  <!-- ══ LOBBY SCREEN ══ -->
+  <div class="screen active" id="screenLobby">
+    <div class="lobby-grid">
+      <!-- join/create -->
+      <div class="card">
+        <div class="card-title">Créer ou rejoindre</div>
+        <div class="join-form">
+          <div>
+            <label>Ton nom</label>
+            <input type="text" id="inputName" placeholder="ex: El Diego" maxlength="14" />
+          </div>
+          <div>
+            <label>Code salon (laisser vide pour créer)</label>
+            <div class="join-row">
+              <input type="text" id="inputCode" placeholder="ex: ABC1" maxlength="6" style="text-transform:uppercase;font-family:var(--font-mono);letter-spacing:.2em" />
+              <button class="btn btn-gold" id="btnJoin">Entrer →</button>
+            </div>
+          </div>
+          <button class="btn btn-gold" id="btnCreate">+ Créer un salon</button>
+        </div>
+      </div>
+      <!-- rooms list -->
+      <div class="card">
+        <div class="card-title">Salons ouverts <span class="highlight" id="roomCount"></span></div>
+        <div class="rooms-list" id="roomsList">
+          <div class="rooms-empty">Aucun salon actif pour l'instant.</div>
+        </div>
+      </div>
+    </div>
+    <!-- rules -->
+    <div class="card">
+      <div class="card-title">Règles du jeu</div>
+      <div class="rules-grid">
+        <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">5 joueurs construisent un mot espagnol, une lettre chacun à leur tour.</div></div>
+        <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Le mot doit faire <strong style="color:var(--silver)">au moins 5 lettres</strong> pour être considéré comme terminé.</div></div>
+        <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">Celui qui pose la <strong style="color:var(--danger)">dernière lettre d'un mot valide</strong> perd la manche → 0 point.</div></div>
+        <div class="rule-item"><div class="rule-num">4</div><div class="rule-text">Les autres gagnent <strong style="color:var(--gold)">autant de points que le nombre de lettres</strong> du mot.</div></div>
+        <div class="rule-item"><div class="rule-num">5</div><div class="rule-text">La partie dure <strong style="color:var(--silver)">5 manches</strong>. Le plus haut score remporte le Ballon d'Or.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SALON (WAITING ROOM) ══ -->
+  <div class="screen" id="screenSalon">
+    <div class="card">
+      <div class="salon-header">
+        <div>
+          <div class="card-title" style="margin:0 0 6px">Code du salon</div>
+          <div class="salon-code" id="salonCode">----</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-sm" id="btnCopyCode">📋 Copier</button>
+          <button class="btn btn-danger btn-sm" id="btnLeave">Quitter</button>
+        </div>
+      </div>
+      <div class="card-title">Joueurs <span id="salonPlayerCount" style="color:var(--gold)">0/5</span></div>
+      <div class="players-grid" id="salonPlayers"></div>
+      <div style="margin-top:1rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-gold" id="btnStart" disabled>Démarrer la partie →</button>
+        <span id="startHint" style="font-size:12px;color:var(--mist)">Il faut au moins 2 joueurs</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GAME SCREEN ══ -->
+  <div class="screen" id="screenGame">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="round-badge">Manche <span class="num" id="roundNum">1</span> / <span id="roundTotal">5</span></div>
+      <div class="turn-banner" id="turnBanner" style="flex:1">
+        <div class="turn-dot"></div>
+        <span class="turn-name" id="turnName">—</span>
+        <span class="turn-label" id="turnLabel"></span>
+      </div>
+    </div>
+
+    <div class="game-layout">
+      <!-- left col -->
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <!-- word display -->
+        <div class="word-card">
+          <div class="word-letters" id="wordLetters">
+            <span class="word-empty">Le mot commence ici...</span>
+          </div>
+          <div class="word-meta">
+            <span class="word-len" id="wordLen">0</span> lettres
+            <span id="wordStatus"></span>
+          </div>
+        </div>
+        <!-- action -->
+        <div class="card action-card" id="actionArea" style="display:none">
+          <div class="card-title">Ajoute ta lettre</div>
+          <div class="big-letter-input">
+            <input type="text" id="letterInput" maxlength="1" placeholder="A" autocomplete="off" spellcheck="false" />
+            <button class="btn btn-gold" id="btnPlay">Jouer →</button>
+          </div>
+        </div>
+        <div class="card waiting-msg" id="waitingArea">
+          <span class="waiting-dots">En attente</span>
+        </div>
+        <!-- log -->
+        <div class="card">
+          <div class="card-title">Journal</div>
+          <div class="log-area" id="logArea"></div>
+        </div>
+      </div>
+      <!-- right col: scoreboard -->
+      <div class="card" style="align-self:start">
+        <div class="card-title">Scores</div>
+        <div class="score-panel" id="scorePanel"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ROUND END ══ -->
+  <div class="screen" id="screenRoundEnd">
+    <div class="card result-card">
+      <div class="result-icon">😬</div>
+      <div class="result-title" id="reTitle">—</div>
+      <div class="result-sub">A posé la dernière lettre du mot</div>
+      <div class="result-word" id="reWord"></div>
+      <div class="podium" id="rePodium"></div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="btnNextRound">Manche suivante →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GAME END ══ -->
+  <div class="screen" id="screenGameEnd">
+    <div class="card result-card">
+      <div class="result-icon">🏆</div>
+      <div class="result-title">¡El Pibe de Oro est...</div>
+      <div style="font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--gold);margin:8px 0 20px" id="geWinner">—</div>
+      <div class="podium" id="gePodium"></div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="btnRestart">Rejouer →</button>
+        <button class="btn" id="btnBackLobby">Retour au lobby</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div id="toast"></div>
+
+<!-- Socket.io (will be served by the server) -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+// ── UTILS ──
+const COLORS = ['#ffd700','#1D9E75','#D85A30','#7F77DD','#D4537E'];
+const AVATAR_CLASSES = ['av-0','av-1','av-2','av-3','av-4'];
+
+function $(id) { return document.getElementById(id); }
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+function toast(msg, duration=2500) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove('show'), duration);
+}
+function addLog(msg, type='') {
+  const area = $('logArea');
+  const d = document.createElement('div');
+  d.className = 'log-line' + (type ? ' ' + type : '');
+  d.innerHTML = msg;
+  area.insertBefore(d, area.firstChild);
+  while (area.children.length > 30) area.removeChild(area.lastChild);
+}
+function avatarEl(name, index) {
+  return `<div class="player-avatar ${AVATAR_CLASSES[index % 5]}">${name[0].toUpperCase()}</div>`;
+}
+
+// ── STATE ──
+let myName = '';
+let myRoom = null;
+let myId   = null;
+let gameState = null;
+
+// ── SOCKET ──
+const socket = io();
+
+socket.on('connect', () => {
+  $('connDot').classList.add('connected');
+  $('connLabel').textContent = 'Connecté au serveur';
+  myId = socket.id;
+});
+socket.on('disconnect', () => {
+  $('connDot').classList.remove('connected');
+  $('connLabel').textContent = 'Déconnecté';
+});
+
+// ── ROOMS LIST ──
+socket.on('roomsList', (rooms) => {
+  const list = $('roomsList');
+  $('roomCount').textContent = rooms.length > 0 ? `(${rooms.length})` : '';
+  if (rooms.length === 0) {
+    list.innerHTML = '<div class="rooms-empty">Aucun salon actif. Crée le premier !</div>';
+    return;
+  }
+  list.innerHTML = rooms.map(r => `
+    <div class="room-item">
+      <div class="room-icon">⚽</div>
+      <div>
+        <div class="room-name">${r.code}</div>
+        <div class="room-count">${r.players}/${r.maxPlayers} joueurs · ${r.status}</div>
+      </div>
+      <button class="btn btn-sm room-join-btn" onclick="quickJoin('${r.code}')">Rejoindre</button>
+    </div>`).join('');
+});
+
+function quickJoin(code) {
+  $('inputCode').value = code;
+  handleJoin();
+}
+
+// ── SALON EVENTS ──
+socket.on('roomJoined', ({ room, code }) => {
+  myRoom = code;
+  $('salonCode').textContent = code;
+  showScreen('screenSalon');
+  renderSalon(room);
+});
+
+socket.on('roomUpdated', (room) => {
+  if (myRoom) renderSalon(room);
+});
+
+socket.on('error', ({ message }) => {
+  toast('⚠ ' + message);
+});
+
+function renderSalon(room) {
+  const players = room.players;
+  $('salonPlayerCount').textContent = `${players.length}/5`;
+  const grid = $('salonPlayers');
+  const slots = Array(5).fill(null);
+  players.forEach((p, i) => slots[i] = p);
+
+  grid.innerHTML = slots.map((p, i) => {
+    if (!p) return `<div class="player-slot empty"><div class="player-avatar">+</div><div class="player-pname">En attente...</div></div>`;
+    const isMe = p.id === socket.id;
+    return `<div class="player-slot ${isMe ? 'me' : ''}">
+      ${avatarEl(p.name, i)}
+      <div class="player-pname">${p.name}</div>
+      ${isMe ? '<div class="player-badge">▶ Toi</div>' : ''}
+      ${room.host === p.id ? '<div class="player-badge">⭐ Host</div>' : ''}
+    </div>`;
+  }).join('');
+
+  const isHost = room.host === socket.id;
+  const canStart = players.length >= 2 && isHost;
+  $('btnStart').disabled = !canStart;
+  $('btnStart').style.display = isHost ? '' : 'none';
+  $('startHint').textContent = !isHost
+    ? `En attente de l'hôte (${players.find(p=>p.id===room.host)?.name || '?'})`
+    : players.length < 2
+    ? 'Il faut au moins 2 joueurs'
+    : 'Prêt à démarrer !';
+}
+
+// ── GAME EVENTS ──
+socket.on('gameStarted', (state) => {
+  gameState = state;
+  showScreen('screenGame');
+  $('roundTotal').textContent = state.totalRounds;
+  $('logArea').innerHTML = '';
+  addLog('La partie démarre ! Construisez des mots en espagnol.', 'good');
+  renderGame(state);
+});
+
+socket.on('gameUpdated', (state) => {
+  gameState = state;
+  renderGame(state);
+});
+
+socket.on('letterPlayed', ({ playerName, letter, word }) => {
+  addLog(`<span class="actor">${playerName}</span> joue <strong style="color:var(--gold);font-family:var(--font-mono)">${letter}</strong> → ${word}`);
+  renderWordDisplay(word);
+});
+
+socket.on('roundEnded', ({ loser, word, scores, round, totalRounds }) => {
+  gameState = { ...gameState, scores, round, word };
+  showScreen('screenRoundEnd');
+  $('reTitle').textContent = loser.name + ' perd la manche !';
+  $('reWord').textContent = word;
+  const podium = $('rePodium');
+  podium.innerHTML = scores.map((p, i) => {
+    const isLoser = p.id === loser.id;
+    const gained = isLoser ? 0 : word.length;
+    return `<div class="podium-row ${isLoser ? 'loser' : 'first'}">
+      <span class="podium-rank">${i + 1}.</span>
+      <span class="podium-name">${p.name}</span>
+      <span class="podium-pts">${p.score}<span class="delta ${gained > 0 ? 'plus' : 'zero'}"> +${gained}</span></span>
+    </div>`;
+  }).join('');
+  const isHost = gameState && gameState.host === socket.id;
+  $('btnNextRound').style.display = isHost ? '' : 'none';
+  if (!isHost) {
+    const hint = document.createElement('div');
+    hint.style.cssText = 'font-size:12px;color:var(--mist);text-align:center';
+    hint.textContent = "En attente de l'hôte pour la manche suivante...";
+    $('btnNextRound').parentNode.appendChild(hint);
+  }
+  if (round >= totalRounds) {
+    $('btnNextRound').textContent = 'Voir le classement final →';
+    $('btnNextRound').onclick = () => socket.emit('requestGameEnd');
+  }
+});
+
+socket.on('gameEnded', ({ scores }) => {
+  const sorted = [...scores].sort((a, b) => b.score - a.score);
+  $('geWinner').textContent = sorted[0].name + ' !';
+  $('gePodium').innerHTML = sorted.map((p, i) => `
+    <div class="podium-row ${i === 0 ? 'first' : ''}">
+      <span class="podium-rank">${i + 1}.</span>
+      <span class="podium-name">${p.name}</span>
+      <span class="podium-pts">${p.score} pts</span>
+    </div>`).join('');
+  showScreen('screenGameEnd');
+});
+
+function renderGame(state) {
+  $('roundNum').textContent = state.round;
+  const cur = state.players[state.currentPlayerIndex];
+  const isMe = cur && cur.id === socket.id;
+  const banner = $('turnBanner');
+  banner.className = 'turn-banner' + (isMe ? ' my-turn' : '');
+  $('turnName').textContent = cur ? cur.name : '—';
+  $('turnLabel').textContent = isMe ? '▶ À TON TOUR !' : 'joue...';
+  $('actionArea').style.display = isMe ? '' : 'none';
+  $('waitingArea').style.display = isMe ? 'none' : '';
+  if (isMe) { setTimeout(() => $('letterInput').focus(), 50); }
+
+  renderWordDisplay(state.word || '');
+  renderScorePanel(state);
+}
+
+function renderWordDisplay(word) {
+  const el = $('wordLetters');
+  const len = $('wordLen');
+  const status = $('wordStatus');
+  len.textContent = word.length;
+  if (!word) {
+    el.innerHTML = '<span class="word-empty">Le mot commence ici...</span>';
+    status.innerHTML = '';
+    return;
+  }
+  el.innerHTML = word.split('').map((l, i) => {
+    const isNew = i === word.length - 1;
+    const isDanger = word.length >= 5;
+    return `<div class="letter-tile${isNew ? ' new' : ''}${isDanger ? ' danger' : ''}">${l}</div>`;
+  }).join('');
+  if (word.length >= 5) {
+    status.innerHTML = '<span class="warn-badge">⚠ Mot terminable !</span>';
+  } else {
+    status.innerHTML = `<span class="safe-badge">${5 - word.length} lettre${5 - word.length > 1 ? 's' : ''} min restante${5 - word.length > 1 ? 's' : ''}</span>`;
+  }
+}
+
+function renderScorePanel(state) {
+  $('scorePanel').innerHTML = state.players.map((p, i) => {
+    const isActive = i === state.currentPlayerIndex;
+    return `<div class="score-row ${isActive ? 'active' : ''}">
+      <div class="score-av ${AVATAR_CLASSES[i % 5]}">${p.name[0].toUpperCase()}</div>
+      <span class="score-name">${p.name}</span>
+      <span class="score-pts">${state.scores?.find(s => s.id === p.id)?.score ?? 0}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── ACTIONS ──
+function handleJoin() {
+  const name = $('inputName').value.trim();
+  const code = $('inputCode').value.trim().toUpperCase();
+  if (!name) { toast('Entre ton nom !'); $('inputName').focus(); return; }
+  myName = name;
+  socket.emit('joinRoom', { name, code: code || null });
+}
+
+function handleCreate() {
+  const name = $('inputName').value.trim();
+  if (!name) { toast('Entre ton nom !'); $('inputName').focus(); return; }
+  myName = name;
+  socket.emit('joinRoom', { name, code: null });
+}
+
+function handlePlay() {
+  const inp = $('letterInput');
+  const letter = inp.value.trim().toUpperCase();
+  if (!letter || !/^[A-ZÑÁÉÍÓÚÜ]$/.test(letter)) {
+    toast('Entre une seule lettre !'); inp.focus(); return;
+  }
+  socket.emit('playLetter', { letter });
+  inp.value = '';
+  inp.focus();
+}
+
+// ── BUTTON BINDINGS ──
+$('btnJoin').onclick = handleJoin;
+$('btnCreate').onclick = handleCreate;
+$('inputName').onkeydown = e => { if (e.key === 'Enter') handleJoin(); };
+$('inputCode').onkeydown = e => { if (e.key === 'Enter') handleJoin(); };
+$('inputCode').oninput = e => { e.target.value = e.target.value.toUpperCase(); };
+
+$('btnCopyCode').onclick = () => {
+  navigator.clipboard.writeText(myRoom);
+  toast('Code copié ! Partage-le à tes amis.');
+};
+$('btnLeave').onclick = () => { socket.emit('leaveRoom'); myRoom = null; showScreen('screenLobby'); };
+$('btnStart').onclick = () => socket.emit('startGame');
+$('btnPlay').onclick = handlePlay;
+$('letterInput').onkeydown = e => { if (e.key === 'Enter') handlePlay(); };
+$('letterInput').oninput = e => {
+  e.target.value = e.target.value.replace(/[^a-zA-ZñáéíóúüÑÁÉÍÓÚÜ]/g, '').toUpperCase();
+};
+$('btnNextRound').onclick = () => socket.emit('nextRound');
+$('btnRestart').onclick = () => socket.emit('restartGame');
+$('btnBackLobby').onclick = () => { socket.emit('leaveRoom'); myRoom = null; showScreen('screenLobby'); };
+</script>
+</body>
+</html>
