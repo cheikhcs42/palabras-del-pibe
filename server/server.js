@@ -261,5 +261,5 @@ io.on('connection', (socket) => {
 });
 
 // ── START ─────────────────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => console.log(`🚀 Palabras del Pibe de Oro · http://localhost:${PORT}`));
