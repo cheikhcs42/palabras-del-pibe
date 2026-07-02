@@ -77,6 +77,24 @@ function startTimer(room) {
   }, 1000);
 }
 
+function endRoundCustom(room, loserId, reason, points) {
+  clearTimer(room);
+  room.pendingChallenge = null;
+  const loser = room.players.find(p => p.id === loserId);
+  room.players.forEach(p => {
+    if (p.id !== loserId) room.scores[p.id] = (room.scores[p.id]||0) + points;
+  });
+  room.status = 'roundEnd';
+  const scores = room.players.map(p => ({ id: p.id, name: p.name, score: room.scores[p.id]||0 }))
+    .sort((a,b) => b.score-a.score);
+  io.to(room.code).emit('roundEnded', {
+    loser: { id: loserId, name: loser?.name },
+    word: room.word||'(vide)', reason,
+    scores, round: room.round, totalRounds: room.totalRounds,
+    customPoints: points,
+  });
+}
+
 function endRound(room, loserId, reason, voluntary=false) {
   clearTimer(room);
   room.pendingChallenge = null;
@@ -154,6 +172,8 @@ io.on('connection', (socket) => {
         loserName: cur.name,
         hostId: room.host,
       });
+      // Envoyer aussi directement à l'hôte pour forcer l'affichage des boutons
+      io.to(room.host).emit('forceShowVerdict');
       // Timer 30s pour l'hôte — si pas de réponse, mot invalide → partie continue
       room.hostTimer = setTimeout(() => {
         if (!room.pendingChallenge) return;
@@ -221,6 +241,7 @@ io.on('connection', (socket) => {
       word: room.word,
       hostId: room.host,
     });
+    io.to(room.host).emit('forceShowVerdict');
 
     // Timer 30s — si hôte ne répond pas, challenge annulé, partie continue
     room.hostTimer = setTimeout(() => {
@@ -244,11 +265,12 @@ io.on('connection', (socket) => {
   });
 
   // ── HÔTE VALIDE OU REJETTE ──
-  socket.on('hostVerdict', ({ valid }) => {
+  socket.on('hostVerdict', ({ valid, customPoints }) => {
     const room = rooms.get(socket.data.room);
     if (!room || room.host !== socket.id || !room.pendingChallenge) return;
 
     const pc = room.pendingChallenge;
+    if (typeof customPoints === 'number') pc.customPoints = customPoints;
     room.pendingChallenge = null;
     if (room.hostTimer) { clearTimeout(room.hostTimer); room.hostTimer = null; }
     if (room.hostTimerTick) { clearInterval(room.hostTimerTick); room.hostTimerTick = null; }
@@ -270,22 +292,16 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Cas 2 : challenge — "un mot est-il possible avec ces lettres ?"
-    // valid = true  → oui un mot existe → challengeur avait tort → challengeur perd
-    // valid = false → non aucun mot possible → challengé a bloqué → challengé perd
+    // Cas 2 : challenge — l'hôte choisit qui perd ET combien de points
     const { challengerId, challengerName, challengedId, challengedName, word } = pc;
-    let loserId, reason;
-    if (valid) {
-      // Un mot existe avec ces lettres → challengeur avait tort
-      loserId = challengerId;
-      reason = `Un mot est possible ! ${challengerName} avait tort, il perd la manche.`;
-    } else {
-      // Aucun mot possible → challengé a posé une lettre qui bloquait tout
-      loserId = challengedId;
-      reason = `Aucun mot possible ! ${challengedName} perd la manche.`;
-    }
-    io.to(room.code).emit('challengeResult', { word, valid, reason, loserName: room.players.find(p=>p.id===loserId)?.name });
-    setTimeout(() => endRound(room, loserId, reason), 1500);
+    const loserId = valid ? challengerId : challengedId;
+    const loserName = valid ? challengerName : challengedName;
+    const customPoints = (typeof pc.customPoints === 'number') ? pc.customPoints : word.length;
+    const reason = valid
+      ? `Un mot est possible ! ${challengerName} avait tort, il perd la manche.`
+      : `Aucun mot possible ! ${challengedName} perd la manche.`;
+    io.to(room.code).emit('challengeResult', { word, valid, reason, loserName, customPoints });
+    setTimeout(() => endRoundCustom(room, loserId, reason, customPoints), 1500);
   });
 
   socket.on('nextRound', () => {

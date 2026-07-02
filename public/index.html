@@ -401,7 +401,7 @@ input::placeholder{color:var(--mist)}
 <script>
 const AVC=['#3B7DD8','#1D9E75','#C85D30','#9B59B6','#D4AC0D'];
 const socket=io();
-let myId='',myRoom=null,gs=null,TMAX=15;
+let myId=socket.id||'',myRoom=null,gs=null,TMAX=15;
 
 const $=id=>document.getElementById(id);
 function screen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active')}
@@ -453,6 +453,7 @@ socket.on('timerTick',({timeLeft,max})=>timerUI(timeLeft,max));
 socket.on('timerOut',({playerName})=>log(`\u23f1 ${playerName} n'a pas jou\u00e9 \u00e0 temps !`,'ev'));
 
 socket.on('challengePending',({challengerName,challengedName,word,hostId})=>{
+  myId=myId||socket.id;
   const isHost=myId===hostId;
   $('verdictTit').textContent='Challenge !';
   $('verdictSub').innerHTML='<strong>'+challengerName+'</strong> pense qu\'aucun mot n\'est possible avec <strong>'+word+'</strong>';
@@ -461,13 +462,37 @@ socket.on('challengePending',({challengerName,challengedName,word,hostId})=>{
     $('btnValid').textContent='✓ Un mot existe';
     $('btnInvalid').textContent='✗ Aucun mot possible';
   }
+  _verdictIsChallenge=true;
+  _verdictPts=word.length; // défaut = longueur du mot
+  $('verdictPtsVal').textContent=_verdictPts;
+  $('verdictPoints').style.display=isHost?'block':'none';
   $('verdictBtns').style.display=isHost?'flex':'none';
   $('verdictWait').style.display=isHost?'none':'block';
   $('verdictOv').classList.add('show');
   log('⚡ '+challengerName+' pense qu\'aucun mot n\'est possible avec "'+word+'"','wn');
 });
-$('btnValid').onclick=()=>socket.emit('hostVerdict',{valid:true});
-$('btnInvalid').onclick=()=>socket.emit('hostVerdict',{valid:false});
+let _verdictIsChallenge = false;
+let _verdictPts = 5;
+
+$('btnPtsMinus').onclick=()=>{
+  _verdictPts=Math.max(1,_verdictPts-1);
+  $('verdictPtsVal').textContent=_verdictPts;
+};
+$('btnPtsPlus').onclick=()=>{
+  _verdictPts=Math.min(99,_verdictPts+1);
+  $('verdictPtsVal').textContent=_verdictPts;
+};
+
+$('btnValid').onclick=()=>{
+  const payload={valid:true};
+  if(_verdictIsChallenge) payload.customPoints=_verdictPts;
+  socket.emit('hostVerdict',payload);
+};
+$('btnInvalid').onclick=()=>{
+  const payload={valid:false};
+  if(_verdictIsChallenge) payload.customPoints=_verdictPts;
+  socket.emit('hostVerdict',payload);
+};
 
 socket.on('hostTimerTick',({timeLeft,max})=>{
   $('verdictTimerNum').textContent=timeLeft;
@@ -478,7 +503,9 @@ socket.on('hostTimerTick',({timeLeft,max})=>{
 });
 
 socket.on('wordCheckPending',({word,loserName,hostId})=>{
+  myId=myId||socket.id; // s'assurer que myId est bien set
   const isHost=myId===hostId;
+  console.log('[wordCheck] myId='+myId+' hostId='+hostId+' isHost='+isHost);
   $('verdictTit').textContent='Ce mot existe ?';
   $('verdictSub').innerHTML='<strong>'+loserName+'</strong> a formé le mot — est-ce un mot français valide ?';
   $('verdictWord').textContent=word;
@@ -486,10 +513,18 @@ socket.on('wordCheckPending',({word,loserName,hostId})=>{
     $('btnValid').textContent='✓ Mot valide';
     $('btnInvalid').textContent='✗ Mot invalide';
   }
+  _verdictIsChallenge=false;
+  $('verdictPoints').style.display='none';
   $('verdictBtns').style.display=isHost?'flex':'none';
   $('verdictWait').style.display=isHost?'none':'block';
   $('verdictOv').classList.add('show');
   log('❓ "'+word+'" — l\'hôte vérifie...','wn');
+});
+
+// Fallback: si l'hôte reçoit wordCheckPending mais myId n'était pas encore set
+socket.on('forceShowVerdict', () => {
+  $('verdictBtns').style.display='flex';
+  $('verdictWait').style.display='none';
 });
 
 socket.on('wordCheckResult',({word,valid,reason})=>{
